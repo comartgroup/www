@@ -71,6 +71,7 @@ figure { margin: 0; }   /* UA default is 1em 40px — kills grid column alignmen
 .section { padding: clamp(72px, 9vw, 140px) 0; }
 section[id] { scroll-margin-top: calc(var(--header-h) + 8px); }
 .section-head { max-width: 900px; }
+.section-head.is-wide { max-width: none; }   /* 標題要維持單行時使用 */
 .section-head h2 {
   font-size: clamp(2rem, 4.2vw, 3.4rem);
   font-stretch: 112%;
@@ -220,11 +221,13 @@ section[id] { scroll-margin-top: calc(var(--header-h) + 8px); }
 .hero__kicker::before { content: ""; width: 46px; height: 2px; background: var(--red); }
 .hero h1 {
   margin: 28px 0 0;
-  font-size: clamp(2.7rem, 6.6vw, 6.1rem);
+  /* 斷行由 <br> 決定。上限收到 5.9rem 是量出來的：
+     「From Product Concept」在 6.1rem 時需要 1130px，容器只有 1120px。 */
+  font-size: clamp(2.7rem, 6.4vw, 5.9rem);
   font-stretch: 115%;
   letter-spacing: -.03em;
   line-height: .98;
-  max-width: 17ch;
+  max-width: 100%;
 }
 .hero h1 em { font-style: normal; color: var(--red-bright); }
 .hero__sub {
