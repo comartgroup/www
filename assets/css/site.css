@@ -908,3 +908,32 @@ section[id] { scroll-margin-top: calc(var(--header-h) + 8px); }
 @media (max-width: 1100px) { .certgrid { grid-template-columns: repeat(3, 1fr); } }
 @media (max-width: 760px)  { .certgrid { grid-template-columns: repeat(2, 1fr); } }
 @media (max-width: 460px)  { .certgrid { grid-template-columns: 1fr; } }
+
+/* =========================================================
+   指定為單行的標題（2026-08-22 Woody）
+   ---------------------------------------------------------
+   「Innovative ODM reliable partner」與「Make mobile life better.」
+   可以縮小，但不分行。字級縮到能容納整句，並在 760px 以上鎖定不換行；
+   760px 以下仍允許換行，否則手機必然溢出。
+   ========================================================= */
+
+.page-hero h1.is-single {
+  max-width: none;
+  font-size: clamp(1.7rem, 4vw, 3.3rem);
+  letter-spacing: -.025em;
+}
+
+.vision__statement.is-inline {
+  /* Company 頁的願景在 .split 右欄裡，可用寬度比首頁窄，字級要再收一階 */
+  font-size: clamp(1.8rem, 3.4vw, 3.1rem);
+  max-width: none;
+}
+
+@media (min-width: 761px) {
+  .page-hero h1.is-single,
+  .vision__statement,
+  .vision__statement.is-inline { white-space: nowrap; }
+}
+
+/* 首頁的願景大字：維持氣勢但要能單行容納 */
+.vision__statement { font-size: clamp(2.1rem, 5.2vw, 4.4rem); max-width: none; }
