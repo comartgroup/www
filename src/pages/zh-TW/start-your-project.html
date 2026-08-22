@@ -1,0 +1,175 @@
+<!-- ============ PAGE HERO ============ -->
+<section class="page-hero">
+  <div class="page-hero__media"><img src="{{ROOT}}assets/img/molding-line.jpg" alt=""></div>
+  <div class="wrap">
+    <nav class="crumbs" aria-label="頁面路徑">
+      <a href="{{BASE}}">首頁</a> <span>/</span> <span>啟動您的專案</span>
+    </nav>
+    <h1>告訴我們您的產品現在走到哪裡。</h1>
+    <p class="page-hero__lead">
+      第一步只需要背景資訊——不用圖檔、不用 BOM、不用 CAD。等我們了解這個專案，
+      而且雙方都想繼續往下走，再簽保密協議、透過安全的管道交換機密資料。
+    </p>
+    <div class="page-hero__meta">
+      <span>第 1 步 — 專案背景</span>
+      <span>第 2 步 — 保密協議與技術資料</span>
+    </div>
+  </div>
+</section>
+
+<!-- ============ 表單 ============ -->
+<section class="section">
+  <div class="wrap">
+    <div class="section-head reveal">
+      <span class="eyebrow">第 1 步 — 專案洽詢</span>
+      <h2>要給您一個有用的答案，我們需要的背景。</h2>
+      <p class="lead">
+        這個階段請不要附上圖檔、BOM 或 CAD 檔案。保密協議簽署之後，
+        我們會安排安全的交換方式。
+      </p>
+    </div>
+
+    <form class="form reveal" id="enquiryForm" novalidate>
+      <div class="field">
+        <label for="company">公司名稱 *</label>
+        <input type="text" id="company" name="company" required autocomplete="organization">
+      </div>
+      <div class="field">
+        <label for="contact">聯絡人 *</label>
+        <input type="text" id="contact" name="contact" required autocomplete="name">
+      </div>
+      <div class="field">
+        <label for="email">公司電子郵件 *</label>
+        <input type="email" id="email" name="email" required autocomplete="email">
+      </div>
+      <div class="field">
+        <label for="country">國家／地區 *</label>
+        <input type="text" id="country" name="country" required autocomplete="country-name">
+      </div>
+
+      <div class="field">
+        <label for="ptype">產品類型 *</label>
+        <select id="ptype" name="ptype" required>
+          <option value="">請選擇</option>
+          <option value="Mobile &amp; device accessories">行動裝置配件</option>
+          <option value="Wireless charging">無線充電</option>
+          <option value="Automotive parts &amp; accessories">汽車零件與配件</option>
+          <option value="Other consumer electronics">其他消費性電子</option>
+          <option value="Plastic, hardware &amp; electronics integration">塑膠、五金與電子整合</option>
+          <option value="Other">其他</option>
+        </select>
+      </div>
+      <div class="field">
+        <label for="stage">目前的開發階段 *</label>
+        <select id="stage" name="stage" required>
+          <option value="">請選擇</option>
+          <option value="Idea / concept only">只有想法／概念</option>
+          <option value="Early design or sketches">初期設計或草圖</option>
+          <option value="Complete product data, ready for tooling">產品資料完整，可以開模</option>
+          <option value="Existing product, looking to customise">現有產品，想做客製化</option>
+          <option value="Existing product, looking to transfer production">現有產品，想轉移生產</option>
+        </select>
+      </div>
+      <div class="field">
+        <label for="services">需要的服務 *</label>
+        <select id="services" name="services" required>
+          <option value="">請選擇</option>
+          <option value="Product planning &amp; design">產品規劃與設計</option>
+          <option value="Mechanical &amp; electronics engineering">機構與電子工程</option>
+          <option value="Prototyping, DFM &amp; tooling">樣品製作、DFM 與模具開發</option>
+          <option value="Plastic injection &amp; manufacturing">塑膠射出與製造</option>
+          <option value="Assembly, testing &amp; quality">組裝、測試與品質</option>
+          <option value="Supply chain &amp; delivery">供應鏈與交付</option>
+          <option value="Full programme, concept to mass production">全程委託，從概念到量產</option>
+        </select>
+      </div>
+      <div class="field">
+        <label for="volume">預估年用量</label>
+        <input type="text" id="volume" name="volume" placeholder="例如：20,000 pcs／年">
+      </div>
+      <div class="field">
+        <label for="market">目標市場</label>
+        <input type="text" id="market" name="market" placeholder="例如：歐盟實體零售、美國電商">
+      </div>
+      <div class="field">
+        <label for="launch">預計上市時間</label>
+        <input type="text" id="launch" name="launch" placeholder="例如：2027 Q3">
+      </div>
+
+      <div class="field is-wide">
+        <label for="summary">專案說明 *</label>
+        <textarea id="summary" name="summary" required
+          placeholder="這是什麼產品？哪些地方必須改或必須開發？時程上是什麼在推動它？"></textarea>
+      </div>
+
+      <div class="field is-wide">
+        <label for="nda">在進一步討論之前，您需要先簽保密協議嗎？</label>
+        <select id="nda" name="nda">
+          <option value="Yes — please send your NDA">需要——請提供你們的版本</option>
+          <option value="Yes — we will send ours">需要——我們會提供我們的版本</option>
+          <option value="Not at this stage">現階段還不需要</option>
+        </select>
+      </div>
+
+      <p class="form__note">
+        標示 * 的欄位為必填。我們用這些資訊把您的洽詢轉給正確的團隊，並準備第一次回覆。
+        MOQ 與交期會依產品、材質、模具複雜度與訂單數量評估。
+      </p>
+
+      <div class="form__actions">
+        <button class="btn" type="submit" id="enquirySubmit">送出洽詢 <span class="arrow">→</span></button>
+        <a class="tlink" href="mailto:sales@comart.com.tw">或寄信到 sales@comart.com.tw <span>→</span></a>
+      </div>
+
+      <p class="placeholder-flag is-wide" id="formNote" style="grid-column:1/-1" hidden></p>
+    </form>
+  </div>
+</section>
+
+<!-- ============ 第二階段說明 ============ -->
+<section class="section on-dark">
+  <div class="wrap">
+    <div class="section-head reveal">
+      <span class="eyebrow">第 2 步 — 談過之後</span>
+      <h2>機密資料，用正確的方式交換。</h2>
+      <p class="lead">
+        當我們的業務團隊確認了這個專案，而且雙方都想繼續往下走，我們會先簽保密協議，
+        再透過安全的管道交換技術資料。
+      </p>
+    </div>
+    <ul class="speclist reveal" style="margin-top:44px">
+      <li><b>2D／3D 圖檔</b>在保密協議之後，透過安全管道交換，而不是用電子郵件夾檔。</li>
+      <li><b>BOM</b>零件清單與尋源上的限制。</li>
+      <li><b>技術規格</b>性能、公差與材質要求。</li>
+      <li><b>測試與認證要求</b>必須證明什麼，以及依據哪一項標準、哪一個市場。</li>
+    </ul>
+  </div>
+</section>
+
+<!-- ============ 聯絡資訊 ============ -->
+<section class="section">
+  <div class="wrap">
+    <div class="section-head reveal">
+      <span class="eyebrow">直接聯絡</span>
+      <h2>或者直接聯絡團隊。</h2>
+    </div>
+    <ul class="speclist reveal" style="margin-top:40px;grid-template-columns:repeat(3,1fr)">
+      <li><b>台灣 — 總部</b>
+        怡業股份有限公司<br>
+        <a href="tel:+886289111133">+886-2-8911-1133</a><br>
+        <a href="mailto:sales@comart.com.tw">sales@comart.com.tw</a>
+      </li>
+      <li><b>中國 — 東莞</b>
+        東莞恒群塑膠有限公司<br>
+        <a href="tel:+8676923064133">+86-769-2306-4133</a>
+      </li>
+      <li><b>越南 — 北江</b>
+        越南怡業責任有限公司<br>
+        <a href="tel:+842043561133">+84-204-356-1133</a>
+      </li>
+    </ul>
+  </div>
+</section>
+
+<script src="{{ROOT}}assets/js/config.js"></script>
+<script src="{{ROOT}}assets/js/enquiry.js" defer></script>

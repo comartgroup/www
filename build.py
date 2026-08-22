@@ -201,7 +201,12 @@ def main():
             if os.path.exists(os.path.join(SRC, 'pages', l['code'], p['src'])):
                 translated += 1
             total += 1
-        note = '' if l['code'] == DEFAULT_LANG else '  （已翻譯 %d/%d 頁，其餘暫用英文）' % (translated, len(pages))
+        if l['code'] == DEFAULT_LANG:
+            note = ''
+        elif translated == len(pages):
+            note = '  （%d 頁全部已翻譯）' % translated
+        else:
+            note = '  （已翻譯 %d/%d 頁，其餘暫用英文）' % (translated, len(pages))
         print('  ✓ %-6s %2d 頁 → /%s%s' % (l['label'], len(pages), l['dir'], note))
 
     write(os.path.join(BASE, 'sitemap.xml'), build_sitemap(sitemap_entries))

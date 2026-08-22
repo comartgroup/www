@@ -1,0 +1,117 @@
+<!-- ============ PAGE HERO ============ -->
+<section class="page-hero">
+  <div class="page-hero__media"><img src="{{ROOT}}assets/img/molding-line.jpg" alt=""></div>
+  <div class="wrap">
+    <nav class="crumbs" aria-label="Đường dẫn trang">
+      <a href="{{BASE}}">Trang chủ</a> <span>/</span> <span>Sản phẩm</span>
+    </nav>
+    <h1>Hai lộ trình<br>đến sản phẩm của riêng bạn.</h1>
+    <p class="page-hero__lead">
+      Cùng chúng tôi phát triển một sản phẩm mới, hoặc bắt đầu từ một sản phẩm đã được
+      kiểm chứng trong sản xuất và biến nó thành của bạn.
+    </p>
+    <div class="page-hero__meta">
+      <span>Sản phẩm hiện có</span>
+      <span>Tùy biến nhanh</span>
+    </div>
+  </div>
+</section>
+
+<!-- ============ 雙入口 ============ -->
+<section class="section products on-dark">
+  <div class="wrap">
+    <div class="prod-grid">
+      <article class="prod reveal">
+        <span class="tag">Lộ trình A</span>
+        <h3>Sản phẩm hiện có</h3>
+        <p>
+          Đây là những sản phẩm hiện có của chúng tôi. Chúng được thiết kế với tính mô-đun cao,
+          nên chúng tôi có thể kết hợp và điều chỉnh thành sản phẩm phù hợp nhất với yêu cầu của
+          bạn — mà không phải bắt đầu lại phần khuôn mẫu và kiểm chứng từ số không.
+        </p>
+        <ul>
+          <li>Tính mô-đun cao</li>
+          <li>Kết hợp linh hoạt</li>
+          <li>Đã kiểm chứng trong sản xuất</li>
+        </ul>
+        <div><a class="tlink" href="#catalogue">Xem sản phẩm hiện có <span>→</span></a></div>
+      </article>
+      <article class="prod reveal">
+        <span class="tag">Lộ trình B</span>
+        <h3>Sản phẩm tùy biến nhanh</h3>
+        <p>
+          Một lộ trình ngắn hơn cho các thương hiệu cần nhanh chóng có SKU riêng: tùy biến logo,
+          màu sắc, ngoại quan và bao bì trên những sản phẩm đã đang trong sản xuất.
+        </p>
+        <ul>
+          <li>Logo &amp; màu sắc</li>
+          <li>Ngoại quan</li>
+          <li>Bao bì</li>
+        </ul>
+        <div><a class="tlink" href="#catalogue">Xem tùy biến nhanh <span>→</span></a></div>
+      </article>
+    </div>
+  </div>
+</section>
+
+<!-- ============ 產品清單（資料層） ============ -->
+<section class="section" id="catalogue">
+  <div class="wrap">
+    <div class="section-head reveal">
+      <span class="eyebrow">Danh mục sản phẩm</span>
+      <h2>Các sản phẩm có thể phát triển.</h2>
+      <p class="lead">
+        Tìm theo tên hoặc mã sản phẩm, hoặc lọc theo danh mục. Thông số đầy đủ, tình trạng khuôn
+        và giá sẽ do đầu mối kinh doanh của bạn cung cấp sau khi chúng tôi hiểu rõ sản lượng và
+        thị trường đích của bạn.
+      </p>
+    </div>
+
+    <div class="cat-count reveal" id="prodCount" hidden></div>
+
+    <div class="prod-filters reveal" id="prodFilters" hidden></div>
+
+    <div class="prod-catalogue" id="prodGrid" aria-live="polite">
+      <p class="prod-state">Đang tải sản phẩm…</p>
+    </div>
+
+    <p class="cat-more" id="prodMore" hidden></p>
+
+  </div>
+</section>
+
+<!-- ============ 型錄下載 ============ -->
+<section class="section on-dark">
+  <div class="wrap">
+    <div class="section-head reveal">
+      <span class="eyebrow">Tải danh mục</span>
+      <h2>Bạn muốn xem danh mục bản in?</h2>
+      <p class="lead">
+        Danh mục sản phẩm hiện hành của chúng tôi có thể tải xuống. Tài liệu mô tả năng lực và
+        các giấy chứng nhận đầy đủ sẽ do đầu mối kinh doanh của bạn cung cấp.
+      </p>
+    </div>
+    <div class="row" style="margin-top:36px;display:flex;flex-wrap:wrap;gap:14px">
+      <a class="btn btn--ghost" href="{{BASE}}start-your-project/">Yêu cầu danh mục <span class="arrow">→</span></a>
+    </div>
+  </div>
+</section>
+
+<!-- ============ END CTA ============ -->
+<section class="endcta">
+  <div class="wrap">
+    <h2>Đã tìm được sản phẩm gần với nhu cầu của bạn?</h2>
+    <p>
+      Hãy cho chúng tôi biết đó là sản phẩm nào và những gì cần thay đổi. Chúng tôi sẽ cho bạn biết
+      đó là một việc tùy biến, một phiên bản dẫn xuất, hay một dự án phát triển mới — và mỗi phương án
+      tốn của bạn bao nhiêu thời gian.
+    </p>
+    <div class="row">
+      <a class="btn" href="{{BASE}}start-your-project/">Bắt đầu dự án của bạn <span class="arrow">→</span></a>
+      <a class="btn btn--ghost" href="{{BASE}}services/">Cách chúng tôi làm việc <span class="arrow">→</span></a>
+    </div>
+  </div>
+</section>
+
+<script src="{{ROOT}}assets/js/config.js"></script>
+<script src="{{ROOT}}assets/js/products.js" defer></script>

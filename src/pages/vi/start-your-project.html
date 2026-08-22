@@ -1,0 +1,177 @@
+<!-- ============ PAGE HERO ============ -->
+<section class="page-hero">
+  <div class="page-hero__media"><img src="{{ROOT}}assets/img/molding-line.jpg" alt=""></div>
+  <div class="wrap">
+    <nav class="crumbs" aria-label="Đường dẫn trang">
+      <a href="{{BASE}}">Trang chủ</a> <span>/</span> <span>Bắt đầu dự án của bạn</span>
+    </nav>
+    <h1>Hãy cho chúng tôi biết sản phẩm của bạn đang ở đâu.</h1>
+    <p class="page-hero__lead">
+      Bước đầu tiên này chỉ cần thông tin bối cảnh — không cần bản vẽ, không cần BOM, không cần CAD.
+      Khi chúng tôi đã hiểu dự án và cả hai bên đều muốn tiếp tục, chúng ta sẽ ký NDA và trao đổi
+      dữ liệu mật qua một kênh an toàn.
+    </p>
+    <div class="page-hero__meta">
+      <span>Bước 1 — Bối cảnh dự án</span>
+      <span>Bước 2 — NDA &amp; dữ liệu kỹ thuật</span>
+    </div>
+  </div>
+</section>
+
+<!-- ============ 表單 ============ -->
+<section class="section">
+  <div class="wrap">
+    <div class="section-head reveal">
+      <span class="eyebrow">Bước 1 — Yêu cầu dự án</span>
+      <h2>Những thông tin bối cảnh chúng tôi cần để trả lời bạn một cách hữu ích.</h2>
+      <p class="lead">
+        Ở giai đoạn này, vui lòng không gửi kèm bản vẽ, BOM hay tệp CAD. Chúng tôi sẽ thu xếp một
+        kênh trao đổi an toàn sau khi NDA được ký kết.
+      </p>
+    </div>
+
+    <form class="form reveal" id="enquiryForm" novalidate>
+      <div class="field">
+        <label for="company">Tên công ty *</label>
+        <input type="text" id="company" name="company" required autocomplete="organization">
+      </div>
+      <div class="field">
+        <label for="contact">Người liên hệ *</label>
+        <input type="text" id="contact" name="contact" required autocomplete="name">
+      </div>
+      <div class="field">
+        <label for="email">Email công ty *</label>
+        <input type="email" id="email" name="email" required autocomplete="email">
+      </div>
+      <div class="field">
+        <label for="country">Quốc gia / khu vực *</label>
+        <input type="text" id="country" name="country" required autocomplete="country-name">
+      </div>
+
+      <div class="field">
+        <label for="ptype">Loại sản phẩm *</label>
+        <select id="ptype" name="ptype" required>
+          <option value="">Vui lòng chọn</option>
+          <option value="Mobile &amp; device accessories">Phụ kiện thiết bị di động</option>
+          <option value="Wireless charging">Sạc không dây</option>
+          <option value="Automotive parts &amp; accessories">Chi tiết &amp; phụ kiện ô tô</option>
+          <option value="Other consumer electronics">Điện tử tiêu dùng khác</option>
+          <option value="Plastic, hardware &amp; electronics integration">Tích hợp nhựa, kim khí &amp; điện tử</option>
+          <option value="Other">Khác</option>
+        </select>
+      </div>
+      <div class="field">
+        <label for="stage">Giai đoạn phát triển hiện tại *</label>
+        <select id="stage" name="stage" required>
+          <option value="">Vui lòng chọn</option>
+          <option value="Idea / concept only">Chỉ mới có ý tưởng / khái niệm</option>
+          <option value="Early design or sketches">Thiết kế sơ bộ hoặc bản phác thảo</option>
+          <option value="Complete product data, ready for tooling">Dữ liệu sản phẩm hoàn chỉnh, sẵn sàng làm khuôn</option>
+          <option value="Existing product, looking to customise">Sản phẩm hiện có, muốn tùy biến</option>
+          <option value="Existing product, looking to transfer production">Sản phẩm hiện có, muốn chuyển nơi sản xuất</option>
+        </select>
+      </div>
+      <div class="field">
+        <label for="services">Dịch vụ cần đến *</label>
+        <select id="services" name="services" required>
+          <option value="">Vui lòng chọn</option>
+          <option value="Product planning &amp; design">Hoạch định &amp; thiết kế sản phẩm</option>
+          <option value="Mechanical &amp; electronics engineering">Kỹ thuật cơ khí &amp; điện tử</option>
+          <option value="Prototyping, DFM &amp; tooling">Mẫu thử, DFM &amp; khuôn mẫu</option>
+          <option value="Plastic injection &amp; manufacturing">Ép nhựa &amp; sản xuất</option>
+          <option value="Assembly, testing &amp; quality">Lắp ráp, thử nghiệm &amp; chất lượng</option>
+          <option value="Supply chain &amp; delivery">Chuỗi cung ứng &amp; giao hàng</option>
+          <option value="Full programme, concept to mass production">Toàn bộ chương trình, từ ý tưởng đến sản xuất hàng loạt</option>
+        </select>
+      </div>
+      <div class="field">
+        <label for="volume">Sản lượng dự kiến hằng năm</label>
+        <input type="text" id="volume" name="volume" placeholder="ví dụ: 20.000 pcs / năm">
+      </div>
+      <div class="field">
+        <label for="market">Thị trường mục tiêu</label>
+        <input type="text" id="market" name="market" placeholder="ví dụ: bán lẻ EU, thương mại điện tử Hoa Kỳ">
+      </div>
+      <div class="field">
+        <label for="launch">Thời điểm dự kiến ra mắt</label>
+        <input type="text" id="launch" name="launch" placeholder="ví dụ: Q3 2027">
+      </div>
+
+      <div class="field is-wide">
+        <label for="summary">Mô tả dự án *</label>
+        <textarea id="summary" name="summary" required
+          placeholder="Sản phẩm là gì, những gì cần thay đổi hoặc cần phát triển, và điều gì đang chi phối tiến độ?"></textarea>
+      </div>
+
+      <div class="field is-wide">
+        <label for="nda">Bạn có cần ký NDA trước khi thảo luận thêm không?</label>
+        <select id="nda" name="nda">
+          <option value="Yes — please send your NDA">Có — vui lòng gửi bản NDA của các bạn</option>
+          <option value="Yes — we will send ours">Có — chúng tôi sẽ gửi bản của mình</option>
+          <option value="Not at this stage">Chưa cần ở giai đoạn này</option>
+        </select>
+      </div>
+
+      <p class="form__note">
+        Các trường có dấu * là bắt buộc. Chúng tôi dùng thông tin này để chuyển yêu cầu của bạn đến
+        đúng đội ngũ và chuẩn bị phản hồi đầu tiên. MOQ và thời gian giao hàng được đánh giá dựa trên
+        sản phẩm, vật liệu, độ phức tạp của khuôn và sản lượng đơn hàng.
+      </p>
+
+      <div class="form__actions">
+        <button class="btn" type="submit" id="enquirySubmit">Gửi yêu cầu <span class="arrow">→</span></button>
+        <a class="tlink" href="mailto:sales@comart.com.tw">Hoặc gửi email tới sales@comart.com.tw <span>→</span></a>
+      </div>
+
+      <p class="placeholder-flag is-wide" id="formNote" style="grid-column:1/-1" hidden></p>
+    </form>
+  </div>
+</section>
+
+<!-- ============ 第二階段說明 ============ -->
+<section class="section on-dark">
+  <div class="wrap">
+    <div class="section-head reveal">
+      <span class="eyebrow">Bước 2 — Sau khi trao đổi</span>
+      <h2>Dữ liệu mật, được trao đổi đúng cách.</h2>
+      <p class="lead">
+        Khi đội ngũ kinh doanh của chúng tôi đã xác nhận dự án và cả hai bên đều muốn tiếp tục,
+        chúng ta ký NDA và trao đổi dữ liệu kỹ thuật qua một kênh an toàn.
+      </p>
+    </div>
+    <ul class="speclist reveal" style="margin-top:44px">
+      <li><b>Bản vẽ 2D / 3D</b>Trao đổi sau khi có NDA, qua kênh an toàn thay vì tệp đính kèm email.</li>
+      <li><b>BOM</b>Danh mục cấu kiện và các ràng buộc về tìm nguồn.</li>
+      <li><b>Thông số kỹ thuật</b>Yêu cầu về hiệu năng, dung sai và vật liệu.</li>
+      <li><b>Yêu cầu thử nghiệm &amp; chứng nhận</b>Cần chứng minh những gì, theo tiêu chuẩn nào và cho thị trường nào.</li>
+    </ul>
+  </div>
+</section>
+
+<!-- ============ 聯絡資訊 ============ -->
+<section class="section">
+  <div class="wrap">
+    <div class="section-head reveal">
+      <span class="eyebrow">Liên hệ trực tiếp</span>
+      <h2>Hoặc liên hệ trực tiếp với đội ngũ.</h2>
+    </div>
+    <ul class="speclist reveal" style="margin-top:40px;grid-template-columns:repeat(3,1fr)">
+      <li><b>Đài Loan — Trụ sở chính</b>
+        COMART CORPORATION<br>
+        <a href="tel:+886289111133">+886-2-8911-1133</a><br>
+        <a href="mailto:sales@comart.com.tw">sales@comart.com.tw</a>
+      </li>
+      <li><b>Trung Quốc — Đông Quản</b>
+        ETERNAL GAIN PLASTICS CO., LTD.<br>
+        <a href="tel:+8676923064133">+86-769-2306-4133</a>
+      </li>
+      <li><b>Việt Nam — Bắc Giang</b>
+        COMART VIETNAM CO., LTD.<br>
+        <a href="tel:+842043561133">+84-204-356-1133</a>
+      </li>
+    </ul>
+  </div>
+</section>
+
+<script src="{{ROOT}}assets/js/config.js"></script>
+<script src="{{ROOT}}assets/js/enquiry.js" defer></script>

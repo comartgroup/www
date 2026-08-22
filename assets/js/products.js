@@ -16,7 +16,72 @@
 
   var CFG = window.COMART_SUPABASE || {};
   var VIEW = "web_products_public";
-  var LANG = "en";                 // 對應 name / features 的 JSONB 鍵：en / zh-TW / vi
+
+  // 站台語言取自 <html lang>，build.py 會為 /、/zh/、/vi/ 各自填入正確的值。
+  // 這三個值同時也是 name / features 這些多語 JSONB 欄位的鍵，所以共用同一個變數。
+  var LANG = (document.documentElement.lang || "en").trim() || "en";
+
+  // 介面字串。找不到當前語言就退回英文——寧可顯示英文，也不要顯示空字串。
+  var STR = {
+    "en": {
+      existing: "Existing Product", quick: "Quick Customization",
+      model: "Model", dim: "Dimensions", material: "Material",
+      noMatch: "No products match your search.",
+      noneYet: "No products published yet.",
+      searchLabel: "Search products",
+      searchPlaceholder: "Search by name or model\u2026",
+      category: "Category", allCategories: "All categories",
+      type: "Type", allTypes: "All types",
+      existingPlural: "Existing Products",
+      notConfigured: "Product data source is not configured.",
+      unavailable: "Product list is temporarily unavailable. Please contact ",
+      count: function (n) { return n + " products"; },
+      countOf: function (n, all) { return n + " of " + all + " products"; },
+      more: function (n, all) {
+        return "Showing <b>" + n + "</b> of <b>" + all + "</b> matching products. " +
+               "<b>Please use keyword search</b> above, or filter by category, to find the rest.";
+      }
+    },
+    "zh-TW": {
+      existing: "既有產品", quick: "快速客製化",
+      model: "型號", dim: "尺寸", material: "材質",
+      noMatch: "沒有符合搜尋條件的產品。",
+      noneYet: "目前尚無上架的產品。",
+      searchLabel: "搜尋產品",
+      searchPlaceholder: "以名稱或型號搜尋\u2026",
+      category: "類別", allCategories: "所有類別",
+      type: "類型", allTypes: "所有類型",
+      existingPlural: "既有產品",
+      notConfigured: "產品資料來源尚未設定。",
+      unavailable: "產品清單暫時無法顯示，請聯絡 ",
+      count: function (n) { return n + " 項產品"; },
+      countOf: function (n, all) { return "符合 " + n + " 項，共 " + all + " 項"; },
+      more: function (n, all) {
+        return "已顯示 <b>" + all + "</b> 項符合條件產品中的 <b>" + n + "</b> 項。" +
+               "請使用上方的<b>關鍵字搜尋</b>，或以類別篩選，以找到其餘產品。";
+      }
+    },
+    "vi": {
+      existing: "Sản phẩm hiện có", quick: "Tùy biến nhanh",
+      model: "Mã sản phẩm", dim: "Kích thước", material: "Vật liệu",
+      noMatch: "Không có sản phẩm nào khớp với tìm kiếm của bạn.",
+      noneYet: "Chưa có sản phẩm nào được công bố.",
+      searchLabel: "Tìm sản phẩm",
+      searchPlaceholder: "Tìm theo tên hoặc mã sản phẩm\u2026",
+      category: "Danh mục", allCategories: "Tất cả danh mục",
+      type: "Loại", allTypes: "Tất cả các loại",
+      existingPlural: "Sản phẩm hiện có",
+      notConfigured: "Nguồn dữ liệu sản phẩm chưa được cấu hình.",
+      unavailable: "Danh sách sản phẩm tạm thời không khả dụng. Vui lòng liên hệ ",
+      count: function (n) { return n + " sản phẩm"; },
+      countOf: function (n, all) { return n + " trong " + all + " sản phẩm"; },
+      more: function (n, all) {
+        return "Đang hiển thị <b>" + n + "</b> trong <b>" + all + "</b> sản phẩm phù hợp. " +
+               "Vui lòng dùng <b>tìm kiếm theo từ khóa</b> ở trên, hoặc lọc theo danh mục, để xem phần còn lại.";
+      }
+    }
+  };
+  var S = STR[LANG] || STR.en;
 
   var ROWS = 5;                    // 初始只顯示 5 列，其餘引導使用搜尋
 
@@ -81,7 +146,7 @@
     });
   }
 
-  function kindLabel(k) { return k === "quick" ? "Quick Customization" : "Existing Product"; }
+  function kindLabel(k) { return k === "quick" ? S.quick : S.existing; }
 
   /* ---------- 繪製 ---------- */
 
@@ -90,13 +155,13 @@
      interface 在 317 筆資料中全為空值，一併省略。 */
   function specRows(p) {
     var rows = [
-      ["Model", p.series],
-      ["Dimensions", p.dim],
-      ["Material", p.material]
+      [S.model, p.series],
+      [S.dim, p.dim],
+      [S.material, p.material]
     ].filter(function (r) { return r[1]; });
     if (!rows.length) return "";
     return '<dl class="pcard__specs">' + rows.map(function (r) {
-      return "<div><dt>" + r[0] + "</dt><dd>" + esc(r[1]) + "</dd></div>";
+      return "<div><dt>" + esc(r[0]) + "</dt><dd>" + esc(r[1]) + "</dd></div>";
     }).join("") + "</dl>";
   }
 
@@ -118,9 +183,8 @@
 
   function render(list) {
     if (!list.length) {
-      grid.innerHTML = all.length
-        ? '<p class="prod-state">No products match your search.</p>'
-        : '<p class="prod-state">No products published yet.</p>';
+      grid.innerHTML = '<p class="prod-state">' +
+        esc(all.length ? S.noMatch : S.noneYet) + "</p>";
       if (moreEl) moreEl.hidden = true;
       return;
     }
@@ -131,9 +195,7 @@
     // 被截斷時明確告知還有多少，並引導去搜尋——而不是靜默地少給
     if (moreEl) {
       if (list.length > cap) {
-        moreEl.innerHTML = "Showing <b>" + shown.length + "</b> of <b>" + list.length +
-          "</b> matching products. <b>Please use keyword search</b> above, or filter by " +
-          "category, to find the rest.";
+        moreEl.innerHTML = S.more(shown.length, list.length);
         moreEl.hidden = false;
       } else {
         moreEl.hidden = true;
@@ -163,9 +225,15 @@
     var list = all.filter(matches);
     render(list);
     if (countEl) {
-      countEl.innerHTML = list.length === all.length
-        ? '<span class="cat-count__n">' + all.length + "</span> products"
-        : '<span class="cat-count__n">' + list.length + "</span> of " + all.length + " products";
+      // 數字包在 span 裡放大顯示，所以字串表回傳的是「含數字的完整句子」，
+      // 這裡再把第一個出現的數字換成帶樣式的版本，語序才不會被寫死成英文的
+      var txt = list.length === all.length
+        ? S.count(all.length)
+        : S.countOf(list.length, all.length);
+      countEl.innerHTML = esc(txt).replace(
+        /\d+/,
+        function (m) { return '<span class="cat-count__n">' + m + "</span>"; }
+      );
       countEl.hidden = false;
     }
   }
@@ -181,20 +249,21 @@
     filterBar.innerHTML =
       '<div class="pfilter">' +
         '<label class="pfilter__search">' +
-          '<span class="vh">Search products</span>' +
-          '<input type="search" id="prodSearch" placeholder="Search by name or model…" autocomplete="off">' +
+          '<span class="vh">' + esc(S.searchLabel) + "</span>" +
+          '<input type="search" id="prodSearch" placeholder="' + esc(S.searchPlaceholder) +
+          '" autocomplete="off">' +
         "</label>" +
         (cats.length
-          ? '<label class="pfilter__select"><span class="vh">Category</span>' +
-            '<select id="prodCat"><option value="all">All categories</option>' +
+          ? '<label class="pfilter__select"><span class="vh">' + esc(S.category) + "</span>" +
+            '<select id="prodCat"><option value="all">' + esc(S.allCategories) + "</option>" +
             cats.map(function (c) { return '<option value="' + esc(c) + '">' + esc(c) + "</option>"; }).join("") +
             "</select></label>"
           : "") +
         (hasKinds
-          ? '<label class="pfilter__select"><span class="vh">Type</span>' +
-            '<select id="prodKind"><option value="all">All types</option>' +
-            '<option value="platform">Existing Products</option>' +
-            '<option value="quick">Quick Customization</option></select></label>'
+          ? '<label class="pfilter__select"><span class="vh">' + esc(S.type) + "</span>" +
+            '<select id="prodKind"><option value="all">' + esc(S.allTypes) + "</option>" +
+            '<option value="platform">' + esc(S.existingPlural) + "</option>" +
+            '<option value="quick">' + esc(S.quick) + "</option></select></label>"
           : "") +
       "</div>";
     filterBar.hidden = false;
@@ -219,7 +288,7 @@
   /* ---------- 啟動 ---------- */
 
   if (!CFG.url) {
-    grid.innerHTML = '<p class="prod-state is-error">Product data source is not configured.</p>';
+    grid.innerHTML = '<p class="prod-state is-error">' + esc(S.notConfigured) + "</p>";
     return;
   }
 
@@ -235,8 +304,8 @@
       if (all.length) { buildControls(); apply(); } else { render(all); }
     })
     .catch(function (err) {
-      grid.innerHTML = '<p class="prod-state is-error">Product list is temporarily unavailable. ' +
-        'Please contact <a href="mailto:sales@comart.com.tw">sales@comart.com.tw</a>.</p>';
+      grid.innerHTML = '<p class="prod-state is-error">' + esc(S.unavailable) +
+        '<a href="mailto:sales@comart.com.tw">sales@comart.com.tw</a></p>';
       if (window.console) console.error("[products]", err);
     });
 })();

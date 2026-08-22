@@ -1,0 +1,86 @@
+{
+  "_comment": "Tiêu đề trang và mô tả SEO tiếng Việt. 只覆寫 title 與 desc；缺的欄位會退回 pages.en.json。頁面清冊本身（out / src / nav）一律以 pages.en.json 為準。",
+  "lang": "vi",
+  "pages": [
+    {
+      "out": "index.html",
+      "title": "COMART — Từ ý tưởng sản phẩm đến sản xuất hàng loạt | Đối tác ODM / OEM",
+      "desc": "COMART là đối tác ODM/OEM cho các thương hiệu điện tử tiêu dùng và phụ kiện ô tô. Một đội ngũ duy nhất bao trùm hoạch định sản phẩm, thiết kế, kỹ thuật cơ khí và điện tử, khuôn mẫu, ép nhựa, lắp ráp, thử nghiệm và giao hàng qua chuỗi cung ứng trên cả Đài Loan, Trung Quốc và Việt Nam."
+    },
+    {
+      "out": "services/index.html",
+      "title": "Dịch vụ — Sáu giai đoạn từ ý tưởng đến sản xuất hàng loạt | COMART",
+      "desc": "Dịch vụ của COMART được tổ chức theo quy trình phát triển sản phẩm của bạn: hoạch định và thiết kế, kỹ thuật cơ khí và điện tử, mẫu thử và khuôn mẫu, ép nhựa, lắp ráp và thử nghiệm, chuỗi cung ứng và giao hàng."
+    },
+    {
+      "out": "services/product-planning-design/index.html",
+      "title": "Hoạch định &amp; Thiết kế sản phẩm | Dịch vụ COMART",
+      "desc": "Xác định bối cảnh sử dụng và yêu cầu sản phẩm, hoạch định sản phẩm, thiết kế công nghiệp, tư vấn sơ bộ về vật liệu và quy trình, tính khả thi về chi phí mục tiêu và sản lượng."
+    },
+    {
+      "out": "services/mechanical-electronics-engineering/index.html",
+      "title": "Kỹ thuật cơ khí &amp; Điện tử | Dịch vụ COMART",
+      "desc": "Thiết kế cơ khí, lựa chọn vật liệu và kết cấu, hoạch định hệ thống điện tử, thiết kế mạch, phát triển firmware, hoạch định thử nghiệm, quản lý đối tác PCB/PCBA và chứng nhận."
+    },
+    {
+      "out": "services/prototyping-dfm-tooling/index.html",
+      "title": "Mẫu thử, DFM &amp; Khuôn mẫu | Dịch vụ COMART",
+      "desc": "Mẫu thử ngoại quan và chức năng, rà soát DFM/DFMA, thiết kế khuôn, phân tích dòng chảy nhựa, mặt phân khuôn, cổng phun và hệ thống đẩy, thử khuôn T1 và sửa khuôn, nghiệm thu và chuyển sang sản xuất."
+    },
+    {
+      "out": "services/plastic-injection-manufacturing/index.html",
+      "title": "Ép nhựa &amp; Sản xuất | Dịch vụ COMART",
+      "desc": "Nhựa kỹ thuật và vật liệu đàn hồi, lực kẹp máy ép và phạm vi kích thước chi tiết, two-shot và over-moulding, độ ổn định quy trình và quản lý thông số, sản xuất thử và sản xuất hàng loạt."
+    },
+    {
+      "out": "services/assembly-testing-quality/index.html",
+      "title": "Lắp ráp, Thử nghiệm &amp; Chất lượng | Dịch vụ COMART",
+      "desc": "Lắp ráp và đóng gói, hướng dẫn công việc và kiểm soát quy trình, thử nghiệm chức năng, độ tin cậy và môi trường, kiểm tra chất lượng và hồ sơ, phối hợp phòng thí nghiệm bên thứ ba."
+    },
+    {
+      "out": "services/supply-chain-delivery/index.html",
+      "title": "Chuỗi cung ứng &amp; Giao hàng | Dịch vụ COMART",
+      "desc": "Quản lý vật liệu và nhà cung cấp cấp hai, phân bổ sản xuất giữa Trung Quốc và Việt Nam, chuyển từ sản xuất thử sang sản xuất hàng loạt, phối hợp đóng gói và xuất hàng, quản lý dự án về tiến độ và chất lượng."
+    },
+    {
+      "out": "global-operations/index.html",
+      "title": "Hoạt động toàn cầu — Một đội ngũ trên Đài Loan, Trung Quốc và Việt Nam | COMART",
+      "desc": "COMART vận hành như một đội ngũ duy nhất trên Đài Loan, Trung Quốc và Việt Nam. Chúng tôi đề xuất phương án sản xuất dựa trên mức độ hoàn thiện của sản phẩm, quy trình, chi phí, tiến độ, xuất xứ và yêu cầu xuất khẩu của bạn."
+    },
+    {
+      "out": "products/index.html",
+      "title": "Sản phẩm — Sản phẩm hiện có &amp; Tùy biến nhanh | COMART",
+      "desc": "Hai lộ trình đến sản phẩm của riêng bạn: thư viện sản phẩm mô-đun hiện có của chúng tôi, có thể kết hợp và điều chỉnh theo yêu cầu của bạn; và tùy biến nhanh logo, màu sắc, ngoại quan và bao bì trên các sản phẩm đang trong sản xuất."
+    },
+    {
+      "out": "quality-compliance/index.html",
+      "title": "Chất lượng &amp; Tuân thủ | COMART",
+      "desc": "Các điểm kiểm soát từ vật liệu đầu vào đến hàng xuất đi, thử nghiệm độ tin cậy và môi trường, phối hợp phòng thí nghiệm bên thứ ba, cùng các chứng nhận ở cấp tập đoàn gồm ISO 9001, ISO 14001, amfori BSCI, Sedex/SMETA và Apple MFi."
+    },
+    {
+      "out": "equipment/index.html",
+      "title": "Thiết bị | COMART",
+      "desc": "Thiết bị sản xuất, khuôn mẫu, lắp ráp và thử nghiệm của COMART tại các cơ sở Trung Quốc và Việt Nam, kèm model và số lượng."
+    },
+    {
+      "out": "company/index.html",
+      "title": "Về công ty — Giới thiệu COMART, tầm nhìn và các cột mốc | COMART",
+      "desc": "COMART phát triển và sản xuất thiết bị điện tử tiêu dùng cùng phụ kiện ô tô từ năm 1994, với hơn 200 nhân viên và hơn 100 bằng sáng chế đã được cấp đến nay."
+    },
+    {
+      "out": "news/index.html",
+      "title": "Tin tức — Triển lãm, năng lực và cập nhật chứng nhận | COMART",
+      "desc": "Tin tức công ty COMART: triển lãm và hội chợ thương mại, phát triển công ty, cập nhật chứng nhận, thiết bị và năng lực mới, cùng các sản phẩm mới ra mắt."
+    },
+    {
+      "out": "start-your-project/index.html",
+      "title": "Bắt đầu dự án của bạn | COMART",
+      "desc": "Hãy cho chúng tôi biết sản phẩm của bạn đang ở đâu. Gửi giai đoạn sản phẩm, ứng dụng, thị trường mục tiêu và sản lượng dự kiến, chúng tôi sẽ phản hồi bằng lộ trình phát triển và những người phù hợp trong đội ngũ."
+    },
+    {
+      "out": "inquiry/index.html",
+      "title": "Liên hệ | COMART",
+      "desc": "Bắt đầu một dự án với COMART, hoặc gửi email trực tiếp cho đội ngũ kinh doanh của chúng tôi. Hãy chọn cách phù hợp với mức độ tiến triển của sản phẩm của bạn."
+    }
+  ]
+}

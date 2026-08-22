@@ -14,6 +14,51 @@
   var form = document.getElementById("enquiryForm");
   if (!form) return;
 
+  var MAILTO = '<a href="mailto:sales@comart.com.tw">sales@comart.com.tw</a>';
+
+  // 站台語言取自 <html lang>；找不到當前語言的字串就退回英文。
+  // 注意：Edge Function 回傳的 details 陣列是英文的伺服器端驗證訊息，這裡不翻譯。
+  var LANG = (document.documentElement.lang || "en").trim() || "en";
+  var STR = {
+    "en": {
+      notConnected: "This form is not connected yet. Please email " + MAILTO + ".",
+      missing: "Please complete the required fields marked with an asterisk.",
+      sending: "Sending\u2026",
+      sent: "Sent",
+      failed: "We could not send your enquiry.",
+      failedTail: "<br>Please email " + MAILTO + ".",
+      unreachable: "We could not reach the server. Please email " + MAILTO + ".",
+      thanks: "<b>Thank you \u2014 your enquiry has been received.</b><br>" +
+              "Our team will come back to you at the email address you provided. " +
+              "If your project is time-critical, you can also reach us directly at " + MAILTO + "."
+    },
+    "zh-TW": {
+      notConnected: "這份表單尚未接上伺服器，請改寄 " + MAILTO + "。",
+      missing: "請填寫標示 * 的必填欄位。",
+      sending: "傳送中\u2026",
+      sent: "已送出",
+      failed: "您的洽詢未能送出。",
+      failedTail: "<br>請改寄 " + MAILTO + "。",
+      unreachable: "無法連線到伺服器，請改寄 " + MAILTO + "。",
+      thanks: "<b>感謝您 —— 我們已收到您的洽詢。</b><br>" +
+              "我們的團隊會用您填寫的電子郵件回覆您。" +
+              "若這個案子時間緊迫，也可以直接聯絡 " + MAILTO + "。"
+    },
+    "vi": {
+      notConnected: "Biểu mẫu này chưa được kết nối. Vui lòng gửi email tới " + MAILTO + ".",
+      missing: "Vui lòng điền các trường bắt buộc có dấu *.",
+      sending: "Đang gửi\u2026",
+      sent: "Đã gửi",
+      failed: "Chúng tôi không gửi được yêu cầu của bạn.",
+      failedTail: "<br>Vui lòng gửi email tới " + MAILTO + ".",
+      unreachable: "Không kết nối được tới máy chủ. Vui lòng gửi email tới " + MAILTO + ".",
+      thanks: "<b>Cảm ơn bạn \u2014 chúng tôi đã nhận được yêu cầu của bạn.</b><br>" +
+              "Đội ngũ của chúng tôi sẽ phản hồi qua địa chỉ email bạn đã cung cấp. " +
+              "Nếu dự án của bạn gấp về thời gian, bạn cũng có thể liên hệ trực tiếp " + MAILTO + "."
+    }
+  };
+  var S = STR[LANG] || STR.en;
+
   var note = document.getElementById("formNote");
   var btn = document.getElementById("enquirySubmit");
 
@@ -46,8 +91,7 @@
     e.preventDefault();
 
     if (!CFG.url) {
-      say("error", "This form is not connected yet. Please email " +
-        '<a href="mailto:sales@comart.com.tw">sales@comart.com.tw</a>.');
+      say("error", S.notConnected);
       return;
     }
 
@@ -59,13 +103,13 @@
     if (missing.length) {
       var first = document.getElementById(missing[0]);
       if (first) first.focus();
-      say("error", "Please complete the required fields marked with an asterisk.");
+      say("error", S.missing);
       return;
     }
 
     btn.disabled = true;
     var label = btn.innerHTML;
-    btn.innerHTML = "Sending…";
+    btn.innerHTML = S.sending;
 
     fetch(CFG.url + "/functions/v1/enquiry", {
       method: "POST",
@@ -82,22 +126,17 @@
       .then(function (r) {
         if (!r.ok) {
           var details = (r.data && r.data.details) ? "<br>" + r.data.details.join("<br>") : "";
-          say("error", "We could not send your enquiry." + details +
-            '<br>Please email <a href="mailto:sales@comart.com.tw">sales@comart.com.tw</a>.');
+          say("error", S.failed + details + S.failedTail);
           btn.disabled = false; btn.innerHTML = label;
           return;
         }
         form.querySelectorAll("input, select, textarea").forEach(function (el) { el.value = ""; });
-        say("ok", "<b>Thank you — your enquiry has been received.</b><br>" +
-          "Our team will come back to you at the email address you provided. " +
-          "If your project is time-critical, you can also reach us directly at " +
-          '<a href="mailto:sales@comart.com.tw">sales@comart.com.tw</a>.');
-        btn.innerHTML = "Sent";
+        say("ok", S.thanks);
+        btn.innerHTML = S.sent;
       })
       .catch(function (err) {
         if (window.console) console.error("[enquiry]", err);
-        say("error", "We could not reach the server. Please email " +
-          '<a href="mailto:sales@comart.com.tw">sales@comart.com.tw</a>.');
+        say("error", S.unreachable);
         btn.disabled = false; btn.innerHTML = label;
       });
   });

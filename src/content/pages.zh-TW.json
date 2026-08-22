@@ -1,0 +1,86 @@
+{
+  "_comment": "繁體中文的頁面標題與 SEO 描述。只覆寫 title 與 desc；缺的欄位會退回 pages.en.json。頁面清冊本身（out / src / nav）一律以 pages.en.json 為準。",
+  "lang": "zh-TW",
+  "pages": [
+    {
+      "out": "index.html",
+      "title": "COMART 怡業 — 從產品概念到量產｜ODM／OEM 夥伴",
+      "desc": "COMART 是消費性電子與汽車配件品牌的 ODM／OEM 夥伴。同一個團隊涵蓋產品規劃、設計、機構與電子工程、模具開發、塑膠射出、組裝、測試與供應鏈交付，橫跨台灣、中國與越南。"
+    },
+    {
+      "out": "services/index.html",
+      "title": "服務項目 — 從概念到量產的六個階段｜COMART",
+      "desc": "COMART 的服務依照您的產品開發流程編排：產品規劃與設計、機構與電子工程、樣品製作與模具開發、塑膠射出、組裝與測試、供應鏈與交付。"
+    },
+    {
+      "out": "services/product-planning-design/index.html",
+      "title": "產品規劃與設計｜COMART 服務項目",
+      "desc": "使用情境與產品需求定義、產品規劃、工業設計、初步的材質與製程建議，以及目標成本與產量可行性評估。"
+    },
+    {
+      "out": "services/mechanical-electronics-engineering/index.html",
+      "title": "機構與電子工程｜COMART 服務項目",
+      "desc": "機構設計、材質與結構選用、電子系統規劃、電路設計、韌體開發、測試規劃，以及 PCB／PCBA 與認證合作夥伴的管理。"
+    },
+    {
+      "out": "services/prototyping-dfm-tooling/index.html",
+      "title": "樣品製作、DFM 與模具開發｜COMART 服務項目",
+      "desc": "外觀樣品與功能樣品、DFM／DFMA 檢討、模具設計、模流分析、分模、進澆與頂出規劃、T1 試模與修模、模具驗收與量產移轉。"
+    },
+    {
+      "out": "services/plastic-injection-manufacturing/index.html",
+      "title": "塑膠射出與製造｜COMART 服務項目",
+      "desc": "工程塑膠與彈性體、射出機噸數與成品尺寸範圍、two-shot 雙料射出與 over-moulding 包覆成型、製程穩定性與參數管理、試產與量產。"
+    },
+    {
+      "out": "services/assembly-testing-quality/index.html",
+      "title": "組裝、測試與品質｜COMART 服務項目",
+      "desc": "組裝與包裝、作業指導書與製程管控、功能與可靠性與環境測試、品質檢驗與紀錄，以及第三方實驗室的協調。"
+    },
+    {
+      "out": "services/supply-chain-delivery/index.html",
+      "title": "供應鏈與交付｜COMART 服務項目",
+      "desc": "材料與二階供應商管理、中國與越南之間的產能配置、試產到量產的移轉、包裝與出貨協調、交期與品質的專案管理。"
+    },
+    {
+      "out": "global-operations/index.html",
+      "title": "全球佈局 — 台灣、中國、越南同一個團隊｜COMART",
+      "desc": "COMART 在台灣、中國與越南以同一個團隊運作。我們依您的產品成熟度、製程、成本、交期、產地與出口需求，提出生產配置建議。"
+    },
+    {
+      "out": "products/index.html",
+      "title": "產品 — 既有產品與快速客製化｜COMART",
+      "desc": "打造自有產品的兩條路徑：可組合、可依需求調整的既有模組化產品；以及在量產中產品上做 Logo、顏色、外觀與包裝的快速客製化。"
+    },
+    {
+      "out": "quality-compliance/index.html",
+      "title": "品質與法規遵循｜COMART",
+      "desc": "從進料到出貨的管控點、可靠性與環境測試、第三方實驗室協調，以及集團層級的 ISO 9001、ISO 14001、amfori BSCI、Sedex／SMETA 與 Apple MFi 等認證。"
+    },
+    {
+      "out": "equipment/index.html",
+      "title": "設備｜COMART",
+      "desc": "COMART 在中國與越南營運據點的製造、模具、組裝與測試設備清單，含型號與數量。"
+    },
+    {
+      "out": "company/index.html",
+      "title": "關於我們 — COMART 的沿革、願景與里程碑｜COMART",
+      "desc": "COMART 自 1994 年起開發與製造消費性電子與汽車配件，全球員工超過 200 人，至今已取得超過 100 件專利。"
+    },
+    {
+      "out": "news/index.html",
+      "title": "最新消息 — 展覽、能力與認證動態｜COMART",
+      "desc": "COMART 公司動態：展覽與商展、公司發展、認證更新、新設備與產能，以及新產品發表。"
+    },
+    {
+      "out": "start-your-project/index.html",
+      "title": "啟動您的專案｜COMART",
+      "desc": "告訴我們您的產品現在走到哪裡。把產品階段、應用、目標市場與數量預估給我們，我們會回覆開發路徑，以及團隊裡對應的人。"
+    },
+    {
+      "out": "inquiry/index.html",
+      "title": "聯絡洽詢｜COMART",
+      "desc": "與 COMART 啟動專案，或直接寄信給我們的業務團隊。看您的產品進展到哪裡，選順手的方式就好。"
+    }
+  ]
+}
