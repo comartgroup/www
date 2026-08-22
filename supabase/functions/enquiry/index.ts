@@ -18,7 +18,18 @@
  */
 
 const NOTIFY_TO = "sales@comart.com.tw";
-const NOTIFY_FROM = "COMART Website <noreply@comart.com.tw>";
+
+/**
+ * 寄件位址由 secret 決定，因為它必須跟 Resend 驗證過的網域一致。
+ *
+ * ★ comart.com.tw 的 SPF 是 `v=spf1 include:spf.protection.outlook.com -all`
+ *   （硬性拒絕，只允許 Microsoft 365），DMARC 是 p=quarantine。
+ *   從主網域寄出會 SPF 失敗並被隔離。因此應在 Resend 驗證一個子網域
+ *   （例如 send.comart.com.tw）並用它當寄件位址，主網域的 SPF 與 DMARC
+ *   完全不必更動——那是公司正式信箱在用的，改錯會讓全公司收不到信。
+ */
+const NOTIFY_FROM = Deno.env.get("NOTIFY_FROM") ??
+                    "COMART Website <noreply@send.comart.com.tw>";
 
 const ALLOWED_ORIGINS = [
   "https://comartgroup.github.io",
@@ -86,6 +97,10 @@ async function notify(row: Record<string, string>) {
   if (!key) {
     console.log("[enquiry] RESEND_API_KEY 未設定，略過通知信，資料已寫入");
     return { sent: false, reason: "no_key" };
+  }
+  if (!Deno.env.get("NOTIFY_FROM")) {
+    console.warn("[enquiry] NOTIFY_FROM 未設定，使用預設值 " + NOTIFY_FROM +
+                 "；若該網域未在 Resend 驗證，寄送會失敗");
   }
 
   const lines = [
