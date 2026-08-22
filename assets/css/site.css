@@ -793,3 +793,43 @@ section[id] { scroll-margin-top: calc(var(--header-h) + 8px); }
 .route:hover .route__go .arrow { transform: translateX(5px); }
 
 @media (max-width: 860px) { .routes { grid-template-columns: 1fr; } }
+
+/* ---------- 產品搜尋與篩選 ---------- */
+.vh {
+  position: absolute; width: 1px; height: 1px; padding: 0; margin: -1px;
+  overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; border: 0;
+}
+.pfilter {
+  margin-top: 44px; display: flex; flex-wrap: wrap; gap: 12px; align-items: center;
+}
+.pfilter__search { flex: 0 1 360px; min-width: 220px; position: relative; }
+.pfilter__search input {
+  width: 100%; font-family: var(--body); font-size: 15px; color: var(--text);
+  padding: 14px 16px; border: 1px solid var(--line); background: #fff; border-radius: 0;
+  transition: border-color .2s ease;
+}
+.pfilter__search input:focus { outline: none; border-color: var(--red); }
+.pfilter__search input::-webkit-search-cancel-button { cursor: pointer; }
+.pfilter__select { flex: 0 1 auto; }
+.pfilter__select select {
+  font-family: var(--body); font-size: 14px; color: var(--text);
+  padding: 14px 16px; border: 1px solid var(--line); background: #fff; border-radius: 0;
+  min-width: 190px; cursor: pointer;
+  transition: border-color .2s ease;
+}
+.pfilter__select select:focus { outline: none; border-color: var(--red); }
+.pfilter__count {
+  margin-left: auto; font-size: 12px; letter-spacing: .14em; text-transform: uppercase;
+  color: var(--silver); white-space: nowrap;
+}
+.pcard__cat {
+  margin-top: 10px; font-size: 11.5px; font-weight: 600; letter-spacing: .12em;
+  text-transform: uppercase; color: var(--text-muted);
+}
+
+@media (max-width: 700px) {
+  .pfilter__select { flex: 0 1 auto; }
+.pfilter__select select { min-width: 0; width: 100%; }
+  .pfilter__select { flex: 1 1 100%; }
+  .pfilter__count { margin-left: 0; }
+}

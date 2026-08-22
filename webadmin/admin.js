@@ -375,7 +375,7 @@
               return "<tr><td><b>" + esc(nm) + '</b><span class="sub">' + esc(p.series || p.id) +
                 (p.status ? " · " + esc(p.status) : "") + "</span></td>" +
                 '<td><select data-kind="' + esc(p.id) + '">' +
-                '<option value="platform"' + (p.web_kind === "platform" ? " selected" : "") + ">Platform Product</option>" +
+                '<option value="platform"' + (p.web_kind === "platform" ? " selected" : "") + ">Existing Product</option>" +
                 '<option value="quick"' + (p.web_kind === "quick" ? " selected" : "") + ">Quick Customization</option>" +
                 "</select></td>" +
                 '<td><label class="switch"><input type="checkbox" data-pub="' + esc(p.id) + '"' +

@@ -5,11 +5,11 @@
    官網「不得」直接讀取該表：表內含 supplier1/2、cost1/2、curr1/2、costRef、
    defaultPrice、bom、bomFiles 等機密欄位。
 
-   正式串接方式：在 Supabase 建立只含可公開欄位的 view（web_products_public），
-   對 anon 角色開放唯讀，官網只讀該 view。細節見 docs/DATA.md。
+   前台只讀 web_products_public 這個 view，它只回傳
+   「已在後台勾選上架」且「status = Normal」的產品，且不含任何成本與供應商欄位。
+   細節見 docs/DATA.md。
 
-   已接上 web_products_public。清單為空代表後台尚未有產品被標記上架，
-   那是正常狀態，不是錯誤。
+   清單為空代表後台尚未有產品被標記上架，那是正常狀態，不是錯誤。
    ========================================================= */
 (function () {
   "use strict";
@@ -22,16 +22,31 @@
   var filterBar = document.getElementById("prodFilters");
   if (!grid) return;
 
+  var all = [];
+
   /* ---------- 資料來源 ---------- */
 
   function fetchProducts() {
     var cols = [
-      "id", "series", "name", "features", "catId", "catId2", "material",
+      "id", "series", "name", "features", "catId", "catId2",
+      "cat_code", "cat_name", "cat2_name", "material",
       "interface", "interfaceA", "interfaceB", "coo", "dim", "weight",
-      "img", "img2", "img3", "status", "web_kind"
+      "img", "img2", "img3", "status", "web_kind", "web_summary"
     ].join(",");
     var url = CFG.url + "/rest/v1/" + VIEW +
               "?select=" + cols + "&order=sort_order.asc,series.asc";
+    return fetch(url, {
+      headers: { apikey: CFG.publishableKey, Authorization: "Bearer " + CFG.publishableKey }
+    }).then(function (r) {
+      // 分類欄位是第四份 SQL 才加的；還沒跑的話退回不含分類的查詢
+      if (r.status === 400) return fetchWithoutCategories();
+      if (!r.ok) throw new Error("HTTP " + r.status);
+      return r.json();
+    });
+  }
+
+  function fetchWithoutCategories() {
+    var url = CFG.url + "/rest/v1/" + VIEW + "?select=*&order=series.asc";
     return fetch(url, {
       headers: { apikey: CFG.publishableKey, Authorization: "Bearer " + CFG.publishableKey }
     }).then(function (r) {
@@ -50,10 +65,12 @@
   }
 
   function esc(s) {
-    return String(s).replace(/[&<>"']/g, function (c) {
+    return String(s == null ? "" : s).replace(/[&<>"']/g, function (c) {
       return { "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c];
     });
   }
+
+  function kindLabel(k) { return k === "quick" ? "Quick Customization" : "Existing Product"; }
 
   /* ---------- 繪製 ---------- */
 
@@ -66,43 +83,100 @@
     var img = p.img
       ? '<div class="pcard__img"><img src="' + esc(p.img) + '" alt="" loading="lazy"></div>'
       : '<div class="pcard__img is-empty" aria-hidden="true"></div>';
-    var kind = p.web_kind === "quick" ? "Quick Customization" : "Platform Product";
     return '<article class="pcard">' + img +
       '<div class="pcard__body">' +
-        '<span class="pcard__kind">' + esc(kind) + '</span>' +
-        '<h3>' + esc(t(p.name) || p.series || p.id) + '</h3>' +
-        (p.series ? '<div class="pcard__series">' + esc(p.series) + '</div>' : '') +
-        (specLine(p) ? '<div class="pcard__spec">' + specLine(p) + '</div>' : '') +
-      '</div></article>';
+        '<span class="pcard__kind">' + esc(kindLabel(p.web_kind)) + "</span>" +
+        "<h3>" + esc(t(p.name) || p.series || p.id) + "</h3>" +
+        (p.series ? '<div class="pcard__series">' + esc(p.series) + "</div>" : "") +
+        (p.cat_name ? '<div class="pcard__cat">' + esc(p.cat_name) + "</div>" : "") +
+        (specLine(p) ? '<div class="pcard__spec">' + specLine(p) + "</div>" : "") +
+      "</div></article>";
   }
 
   function render(list) {
     if (!list.length) {
-      grid.innerHTML = '<p class="prod-state">No products published yet.</p>';
+      grid.innerHTML = all.length
+        ? '<p class="prod-state">No products match your filters.</p>'
+        : '<p class="prod-state">No products published yet.</p>';
       return;
     }
     grid.innerHTML = list.map(card).join("");
   }
 
-  function buildFilters(list, all) {
-    var kinds = [
-      { key: "all", label: "All" },
-      { key: "platform", label: "Platform Products" },
-      { key: "quick", label: "Quick Customization" }
-    ];
-    filterBar.innerHTML = kinds.map(function (k, i) {
-      return '<button class="chip' + (i === 0 ? " is-on" : "") + '" data-filter="' +
-             k.key + '">' + k.label + "</button>";
-    }).join("");
+  /* ---------- 搜尋與篩選 ---------- */
+
+  var state = { q: "", kind: "all", cat: "all" };
+
+  function matches(p) {
+    if (state.kind !== "all" && (p.web_kind || "platform") !== state.kind) return false;
+    if (state.cat !== "all" && (p.cat_name || "") !== state.cat) return false;
+    if (state.q) {
+      // 搜尋所有語言的名稱與型號，讓中文或越南文使用者也搜得到
+      var hay = [
+        JSON.stringify(p.name || ""), p.series, p.id,
+        p.cat_name, p.material, JSON.stringify(p.features || "")
+      ].join(" ").toLowerCase();
+      if (hay.indexOf(state.q) === -1) return false;
+    }
+    return true;
+  }
+
+  function apply() {
+    var list = all.filter(matches);
+    render(list);
+    var count = document.getElementById("prodCount");
+    if (count) {
+      count.textContent = list.length === all.length
+        ? all.length + " products"
+        : list.length + " of " + all.length + " products";
+    }
+  }
+
+  function buildControls() {
+    var cats = all.map(function (p) { return p.cat_name; })
+      .filter(function (c, i, a) { return c && a.indexOf(c) === i; })
+      .sort();
+
+    var hasKinds = all.some(function (p) { return p.web_kind === "quick"; }) &&
+                   all.some(function (p) { return (p.web_kind || "platform") === "platform"; });
+
+    filterBar.innerHTML =
+      '<div class="pfilter">' +
+        '<label class="pfilter__search">' +
+          '<span class="vh">Search products</span>' +
+          '<input type="search" id="prodSearch" placeholder="Search by name or model…" autocomplete="off">' +
+        "</label>" +
+        (cats.length
+          ? '<label class="pfilter__select"><span class="vh">Category</span>' +
+            '<select id="prodCat"><option value="all">All categories</option>' +
+            cats.map(function (c) { return '<option value="' + esc(c) + '">' + esc(c) + "</option>"; }).join("") +
+            "</select></label>"
+          : "") +
+        (hasKinds
+          ? '<label class="pfilter__select"><span class="vh">Type</span>' +
+            '<select id="prodKind"><option value="all">All types</option>' +
+            '<option value="platform">Existing Products</option>' +
+            '<option value="quick">Quick Customization</option></select></label>'
+          : "") +
+        '<span class="pfilter__count" id="prodCount"></span>' +
+      "</div>";
     filterBar.hidden = false;
-    filterBar.addEventListener("click", function (e) {
-      var b = e.target.closest("button[data-filter]");
-      if (!b) return;
-      filterBar.querySelectorAll(".chip").forEach(function (c) { c.classList.remove("is-on"); });
-      b.classList.add("is-on");
-      var f = b.dataset.filter;
-      render(f === "all" ? all : all.filter(function (p) { return (p.web_kind || "platform") === f; }));
+
+    var search = document.getElementById("prodSearch");
+    var timer;
+    search.addEventListener("input", function () {
+      clearTimeout(timer);
+      timer = setTimeout(function () {
+        state.q = search.value.trim().toLowerCase();
+        apply();
+      }, 150);
     });
+
+    var catSel = document.getElementById("prodCat");
+    if (catSel) catSel.addEventListener("change", function () { state.cat = this.value; apply(); });
+
+    var kindSel = document.getElementById("prodKind");
+    if (kindSel) kindSel.addEventListener("change", function () { state.kind = this.value; apply(); });
   }
 
   /* ---------- 啟動 ---------- */
@@ -114,8 +188,9 @@
 
   fetchProducts()
     .then(function (list) {
-      render(list);
-      buildFilters(list, list);
+      all = list || [];
+      render(all);
+      if (all.length) buildControls();
     })
     .catch(function (err) {
       grid.innerHTML = '<p class="prod-state is-error">Product list is temporarily unavailable. ' +
