@@ -10,7 +10,8 @@
  *   這些是指令，不是詞彙替換，一般翻譯 API 的 glossary 做不到。
  *
  * 需要的 secrets：
- *   ANTHROPIC_API_KEY   （已於 2026-08-22 確認存在）
+ *   CLAUDE_API_KEY      本專案實際使用的名稱（2026-08-22 由 secrets list 確認）
+ *                       保留 ANTHROPIC_API_KEY 作為後備，兩者擇一即可
  *
  * 呼叫方式：
  *   POST { text: "...", from: "en", to: ["zh-TW", "vi"], context?: "頁面標題" }
@@ -142,9 +143,10 @@ Deno.serve(async (req) => {
   if (!to.length) return json({ error: "to must contain at least one target language" }, 422, origin);
   if (!(from in LANG_NAME)) return json({ error: `unsupported source language: ${from}` }, 422, origin);
 
-  const apiKey = Deno.env.get("ANTHROPIC_API_KEY");
+  // 本專案的 secret 名稱是 CLAUDE_API_KEY；ANTHROPIC_API_KEY 為後備
+  const apiKey = Deno.env.get("CLAUDE_API_KEY") ?? Deno.env.get("ANTHROPIC_API_KEY");
   if (!apiKey) {
-    console.error("[translate] ANTHROPIC_API_KEY 未設定");
+    console.error("[translate] 找不到 CLAUDE_API_KEY 或 ANTHROPIC_API_KEY");
     return json({ error: "Translation service not configured" }, 500, origin);
   }
 

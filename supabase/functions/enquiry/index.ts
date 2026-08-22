@@ -26,6 +26,10 @@
  *   這封信是內部通知，客戶看不到寄件人，reply_to 已指向客戶本人，
  *   所以醜一點的寄件位址沒有影響。
  *
+ * ★ secret 名稱刻意加 WEB_ 前綴。本 Supabase 專案由多個系統共用，
+ *   專案裡已經存在通用名稱的 NOTIFY_FROM 與 NOTIFY_TO（屬於其他系統），
+ *   若直接讀那兩個名字會拿到別人的設定值。
+ *
  * 之後若要改成正式的 noreply@send.comart.com.tw 寄給 sales@comart.com.tw：
  *   1. 在 Resend 驗證子網域 send.comart.com.tw（不要動主網域的 SPF，
  *      那是 -all 且 M365 正在用，改錯全公司信箱會壞）
@@ -33,8 +37,8 @@
  *                           NOTIFY_TO="sales@comart.com.tw"
  *   程式不需要改。
  */
-const NOTIFY_TO   = Deno.env.get("NOTIFY_TO")   ?? "woody@comart.com.tw";
-const NOTIFY_FROM = Deno.env.get("NOTIFY_FROM") ?? "COMART Website <onboarding@resend.dev>";
+const NOTIFY_TO   = Deno.env.get("WEB_NOTIFY_TO")   ?? "woody@comart.com.tw";
+const NOTIFY_FROM = Deno.env.get("WEB_NOTIFY_FROM") ?? "COMART Website <onboarding@resend.dev>";
 
 const ALLOWED_ORIGINS = [
   "https://comartgroup.github.io",
@@ -183,11 +187,35 @@ Deno.serve(async (req) => {
     return json({ error: "Could not save the enquiry" }, 502, origin);
   }
 
+  const saved = await insert.json().catch(() => null);
+  const savedId = Array.isArray(saved) ? saved[0]?.id : saved?.id;
+
   // 通知信失敗不應該讓客戶看到錯誤——資料已經收到了
   const mail = await notify(clean).catch((e) => {
     console.error("[enquiry] 通知信例外", e);
-    return { sent: false, reason: "exception" };
+    return { sent: false, reason: "exception", detail: String(e).slice(0, 200) };
   });
 
-  return json({ ok: true, notified: mail.sent }, 200, origin);
+  // 把通知結果回填到案件上。Edge Function 的 log 在 CLI 讀不到，
+  // 寄信失敗時若不留痕跡，之後完全查不出是哪個環節壞掉。
+  if (savedId) {
+    const note = mail.sent
+      ? `notify: sent to ${NOTIFY_TO}`
+      : `notify failed (${(mail as Record<string, string>).reason}): ` +
+        `${(mail as Record<string, string>).detail ?? ""}`.slice(0, 400);
+    await fetch(`${url}/rest/v1/web_enquiries?id=eq.${savedId}`, {
+      method: "PATCH",
+      headers: {
+        apikey: serviceKey,
+        authorization: `Bearer ${serviceKey}`,
+        "content-type": "application/json",
+      },
+      body: JSON.stringify({ note }),
+    }).catch(() => { /* 回填失敗不影響主流程 */ });
+  }
+
+  // reason 只是粗略代碼（例如 http_403），不含金鑰或客戶資料
+  return json({ ok: true, notified: mail.sent,
+                reason: mail.sent ? undefined : (mail as Record<string, string>).reason },
+              200, origin);
 });
