@@ -960,3 +960,40 @@ section[id] { scroll-margin-top: calc(var(--header-h) + 8px); }
   font-size: 14.5px; line-height: 1.6; color: var(--text-muted);
 }
 .cat-more b { color: var(--text); font-weight: 600; }
+
+/* =========================================================
+   格線修正：整列未填滿時不露出底色
+   ---------------------------------------------------------
+   原本用「gap:1px + 容器底色」畫格線，但那個底色在沒有卡片的
+   格位會整塊露出來（例如 2 則動態放在 3 欄、搜尋只剩 1 筆產品）。
+   改用每格自身的 box-shadow 畫線：1px 的外框會填滿間隙，
+   空的格位則維持頁面底色。容器的 border 要移除，否則外框會變兩層。
+   ========================================================= */
+.prod-catalogue,
+.news-list,
+.news-grid,
+.qc-chain,
+.apps-grid,
+.speclist {
+  background: transparent;
+  border: 0;
+}
+.prod-catalogue > *,
+.news-list > *,
+.news-grid > *,
+.qc-chain > *,
+.apps-grid > *,
+.speclist > * {
+  box-shadow: 0 0 0 1px var(--line);
+}
+.on-dark .qc-chain > *,
+.on-dark .speclist > *,
+.on-dark .news-list > *,
+.on-dark .news-grid > * {
+  box-shadow: 0 0 0 1px rgba(255, 255, 255, .14);
+}
+/* 空狀態訊息本身不需要格線 */
+.prod-catalogue > .prod-state,
+.news-list > .prod-state,
+.news-grid > .prod-state,
+.news-more { box-shadow: none; }

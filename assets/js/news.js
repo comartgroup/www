@@ -53,11 +53,13 @@
   }
 
   function card(n) {
+    var body = excerpt(t(n.body), 180);
     return '<article class="news">' +
       '<div class="meta"><span class="cat">' + esc(n.category) + "</span>" +
       "<span>" + esc(fmtDate(n.published_at)) + "</span></div>" +
       "<h3>" + esc(t(n.title) || "Untitled") + "</h3>" +
-      '<p>' + esc(excerpt(t(n.body), 180)) + "</p>" +
+      // 內文為空時不輸出段落，否則卡片會留一塊空白
+      (body ? "<p>" + esc(body) + "</p>" : "") +
       "</article>";
   }
 
