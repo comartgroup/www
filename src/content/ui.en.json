@@ -1,0 +1,25 @@
+{
+  "_comment": "介面字串。品牌 slogan 與法人名稱不在此處，因為三語一律使用相同寫法。",
+  "aria_home": "COMART home",
+  "aria_primary": "Primary",
+  "aria_language": "Language",
+  "aria_menu": "Menu",
+  "aria_footer": "Footer",
+
+  "nav_services": "Services",
+  "nav_operations": "Global Operations",
+  "nav_products": "Products",
+  "nav_quality": "Quality",
+  "nav_quality_full": "Quality &amp; Compliance",
+  "nav_equipment": "Equipment",
+  "nav_company": "Company",
+  "nav_news": "News",
+  "nav_inquiry": "Inquiry",
+
+  "since_line": "Since 1994 · Taiwan · China · Vietnam",
+  "site_tw": "Taiwan — Headquarters",
+  "site_cn": "China — Dongguan",
+  "site_vn": "Vietnam — Bac Giang",
+  "rights": "© 1994–2026 COMART CORPORATION. All rights reserved.",
+  "legal": "Privacy Policy · Terms of Use"
+}

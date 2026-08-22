@@ -1,0 +1,25 @@
+{
+  "_comment": "Chuỗi giao diện tiếng Việt. Dùng văn phong thương mại chính thức. Slogan thương hiệu và tên pháp nhân không dịch.",
+  "aria_home": "Trang chủ COMART",
+  "aria_primary": "Điều hướng chính",
+  "aria_language": "Ngôn ngữ",
+  "aria_menu": "Menu",
+  "aria_footer": "Điều hướng chân trang",
+
+  "nav_services": "Dịch vụ",
+  "nav_operations": "Hoạt động toàn cầu",
+  "nav_products": "Sản phẩm",
+  "nav_quality": "Chất lượng",
+  "nav_quality_full": "Chất lượng &amp; Tuân thủ",
+  "nav_equipment": "Thiết bị",
+  "nav_company": "Về COMART",
+  "nav_news": "Tin tức",
+  "nav_inquiry": "Liên hệ",
+
+  "since_line": "Thành lập 1994 · Đài Loan · Trung Quốc · Việt Nam",
+  "site_tw": "Đài Loan — Trụ sở chính",
+  "site_cn": "Trung Quốc — Đông Quan",
+  "site_vn": "Việt Nam — Bắc Giang",
+  "rights": "© 1994–2026 COMART CORPORATION. Bảo lưu mọi quyền.",
+  "legal": "Chính sách bảo mật · Điều khoản sử dụng"
+}

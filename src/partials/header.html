@@ -1,42 +1,40 @@
 <!-- ============ HEADER ============ -->
 <header class="header" id="header">
   <div class="wrap">
-    <a class="brand" href="{{ROOT}}" aria-label="COMART home">
+    <a class="brand" href="{{BASE}}" aria-label="{{UI:aria_home}}">
       <img src="{{ROOT}}assets/img/comart-logo.png" alt="COMART">
     </a>
 
-    <nav class="nav" aria-label="Primary">
-      <a href="{{ROOT}}services/"          data-nav="services">Services</a>
-      <a href="{{ROOT}}global-operations/" data-nav="operations">Global Operations</a>
-      <a href="{{ROOT}}products/"          data-nav="products">Products</a>
-      <a href="{{ROOT}}quality-compliance/" data-nav="quality">Quality</a>
-      <a href="{{ROOT}}equipment/"         data-nav="equipment">Equipment</a>
-      <a href="{{ROOT}}company/"           data-nav="company">Company</a>
-      <a href="{{ROOT}}news/"              data-nav="news">News</a>
+    <nav class="nav" aria-label="{{UI:aria_primary}}">
+      <a href="{{BASE}}services/"          data-nav="services">{{UI:nav_services}}</a>
+      <a href="{{BASE}}global-operations/" data-nav="operations">{{UI:nav_operations}}</a>
+      <a href="{{BASE}}products/"          data-nav="products">{{UI:nav_products}}</a>
+      <a href="{{BASE}}quality-compliance/" data-nav="quality">{{UI:nav_quality}}</a>
+      <a href="{{BASE}}equipment/"         data-nav="equipment">{{UI:nav_equipment}}</a>
+      <a href="{{BASE}}company/"           data-nav="company">{{UI:nav_company}}</a>
+      <a href="{{BASE}}news/"              data-nav="news">{{UI:nav_news}}</a>
     </nav>
 
-    <div class="lang" aria-label="Language">
-      <a href="{{ROOT}}" class="is-active" hreflang="en">EN</a>
-      <span class="is-soon" title="繁體中文版本準備中">繁中</span>
-      <span class="is-soon" title="Phiên bản tiếng Việt đang chuẩn bị">VN</span>
+    <div class="lang" aria-label="{{UI:aria_language}}">
+      {{LANGNAV}}
     </div>
 
-    <a class="btn btn--compact" href="{{ROOT}}inquiry/">Inquiry <span class="arrow">→</span></a>
+    <a class="btn btn--compact" href="{{BASE}}inquiry/">{{UI:nav_inquiry}} <span class="arrow">→</span></a>
 
-    <button class="burger" id="burger" aria-label="Menu" aria-expanded="false">
+    <button class="burger" id="burger" aria-label="{{UI:aria_menu}}" aria-expanded="false">
       <span></span><span></span><span></span>
     </button>
   </div>
 </header>
 
 <div class="mobile-menu" id="mobileMenu">
-  <a href="{{ROOT}}services/">Services</a>
-  <a href="{{ROOT}}global-operations/">Global Operations</a>
-  <a href="{{ROOT}}products/">Products</a>
-  <a href="{{ROOT}}quality-compliance/">Quality &amp; Compliance</a>
-  <a href="{{ROOT}}equipment/">Equipment</a>
-  <a href="{{ROOT}}company/">Company</a>
-  <a href="{{ROOT}}news/">News</a>
-  <a href="{{ROOT}}inquiry/">Inquiry</a>
-  <div class="mm-lang"><a href="{{ROOT}}">EN</a><span class="is-soon">繁體中文</span><span class="is-soon">Tiếng Việt</span></div>
+  <a href="{{BASE}}services/">{{UI:nav_services}}</a>
+  <a href="{{BASE}}global-operations/">{{UI:nav_operations}}</a>
+  <a href="{{BASE}}products/">{{UI:nav_products}}</a>
+  <a href="{{BASE}}quality-compliance/">{{UI:nav_quality_full}}</a>
+  <a href="{{BASE}}equipment/">{{UI:nav_equipment}}</a>
+  <a href="{{BASE}}company/">{{UI:nav_company}}</a>
+  <a href="{{BASE}}news/">{{UI:nav_news}}</a>
+  <a href="{{BASE}}inquiry/">{{UI:nav_inquiry}}</a>
+  <div class="mm-lang">{{LANGNAV}}</div>
 </div>

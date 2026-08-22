@@ -1,0 +1,25 @@
+{
+  "_comment": "繁體中文介面字串。用台灣商業與技術用語，不用中國大陸用語。品牌 slogan 與法人名稱不翻譯。",
+  "aria_home": "COMART 首頁",
+  "aria_primary": "主要導覽",
+  "aria_language": "語言",
+  "aria_menu": "選單",
+  "aria_footer": "頁尾導覽",
+
+  "nav_services": "服務項目",
+  "nav_operations": "全球佈局",
+  "nav_products": "產品",
+  "nav_quality": "品質",
+  "nav_quality_full": "品質與法規",
+  "nav_equipment": "設備",
+  "nav_company": "關於我們",
+  "nav_news": "最新消息",
+  "nav_inquiry": "聯絡洽詢",
+
+  "since_line": "創立於 1994 · 台灣 · 中國 · 越南",
+  "site_tw": "台灣 — 總部",
+  "site_cn": "中國 — 東莞",
+  "site_vn": "越南 — 北江",
+  "rights": "© 1994–2026 COMART CORPORATION 版權所有",
+  "legal": "隱私權政策 · 使用條款"
+}
