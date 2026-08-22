@@ -101,8 +101,16 @@ def main():
         print('  ✓ %-52s %s' % (p['out'], p['title'][:44]))
 
     write(os.path.join(BASE, 'sitemap.xml'), build_sitemap(pages))
+    # robots.txt 只有放在「網域根目錄」才會被爬蟲讀取。
+    # 目前站台在 comartgroup.github.io/www/ 子路徑下，這份是無效的；
+    # 切換到 www.comart.com.tw（站台位於根目錄）之後才會開始生效。
+    #
+    # ★ 不要把 /webadmin/ 之類的路徑寫進 Disallow。
+    #   robots.txt 必須公開可讀才能運作，寫進去等於主動公告後台位置。
+    #   讓搜尋引擎不收錄後台，靠的是 webadmin/index.html 裡的
+    #   <meta name="robots" content="noindex, nofollow">，那個才有效且不外洩路徑。
     write(os.path.join(BASE, 'robots.txt'),
-          'User-agent: *\nAllow: /\nDisallow: /webadmin/\nSitemap: %ssitemap.xml\n' % SITE_URL)
+          'User-agent: *\nAllow: /\nSitemap: %ssitemap.xml\n' % SITE_URL)
     print('\n%d 頁產生完成，另含 sitemap.xml 與 robots.txt' % len(pages))
 
 

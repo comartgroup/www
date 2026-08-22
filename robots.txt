@@ -1,4 +1,3 @@
 User-agent: *
 Allow: /
-Disallow: /webadmin/
 Sitemap: https://comartgroup.github.io/www/sitemap.xml
