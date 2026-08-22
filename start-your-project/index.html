@@ -1,0 +1,301 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Start Your Project | COMART</title>
+<meta name="description" content="Tell us where your product stands today. Send us your product stage, application, target market and volume expectation, and we will come back with a development route and the right people from our team.">
+<link rel="canonical" href="https://comartgroup.github.io/www/start-your-project/">
+<meta property="og:title" content="Start Your Project | COMART">
+<meta property="og:description" content="Tell us where your product stands today. Send us your product stage, application, target market and volume expectation, and we will come back with a development route and the right people from our team.">
+<meta property="og:type" content="website">
+<meta property="og:image" content="../assets/img/hero-tooling.jpg">
+<link rel="icon" type="image/png" href="../assets/img/favicon.png">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Archivo:wdth,wght@75..125,400..800&family=Inter:wght@300..700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="../assets/css/site.css">
+</head>
+<body class="">
+
+<!-- ============ HEADER ============ -->
+<header class="header" id="header">
+  <div class="wrap">
+    <a class="brand" href="../" aria-label="COMART home">
+      <img src="../assets/img/comart-logo.png" alt="COMART">
+    </a>
+
+    <nav class="nav" aria-label="Primary">
+      <a href="../services/"          data-nav="services">Services</a>
+      <a href="../global-operations/" data-nav="operations">Global Operations</a>
+      <a href="../products/"          data-nav="products">Products</a>
+      <a href="../quality-compliance/" data-nav="quality">Quality</a>
+      <a href="../equipment/"         data-nav="equipment">Equipment</a>
+      <a href="../company/"           data-nav="company">Company</a>
+    </nav>
+
+    <div class="lang" aria-label="Language">
+      <a href="../" class="is-active" hreflang="en">EN</a>
+      <span class="is-soon" title="繁體中文版本準備中">繁中</span>
+      <span class="is-soon" title="Phiên bản tiếng Việt đang chuẩn bị">VN</span>
+    </div>
+
+    <a class="btn" href="../start-your-project/">Start Your Project <span class="arrow">→</span></a>
+
+    <button class="burger" id="burger" aria-label="Menu" aria-expanded="false">
+      <span></span><span></span><span></span>
+    </button>
+  </div>
+</header>
+
+<div class="mobile-menu" id="mobileMenu">
+  <a href="../services/">Services</a>
+  <a href="../global-operations/">Global Operations</a>
+  <a href="../products/">Products</a>
+  <a href="../quality-compliance/">Quality &amp; Compliance</a>
+  <a href="../equipment/">Equipment</a>
+  <a href="../company/">Company</a>
+  <a href="../start-your-project/">Start Your Project</a>
+  <div class="mm-lang"><a href="../">EN</a><span class="is-soon">繁體中文</span><span class="is-soon">Tiếng Việt</span></div>
+</div>
+
+
+<!-- ============ PAGE HERO ============ -->
+<section class="page-hero">
+  <div class="page-hero__media"><img src="../assets/img/molding-line.jpg" alt=""></div>
+  <div class="wrap">
+    <nav class="crumbs" aria-label="Breadcrumb">
+      <a href="../">Home</a> <span>/</span> <span>Start Your Project</span>
+    </nav>
+    <h1>Tell us where your product stands today.</h1>
+    <p class="page-hero__lead">
+      This first step asks for context only — no drawings, no BOM, no CAD. Once we understand the
+      project and both sides want to proceed, we exchange confidential data under NDA through a
+      secure channel.
+    </p>
+    <div class="page-hero__meta">
+      <span>Step 1 — Project context</span>
+      <span>Step 2 — NDA &amp; technical data</span>
+    </div>
+  </div>
+</section>
+
+<!-- ============ 表單 ============ -->
+<section class="section">
+  <div class="wrap">
+    <div class="section-head reveal">
+      <span class="eyebrow">Step 1 — Project enquiry</span>
+      <h2>The context we need to give you a useful answer.</h2>
+      <p class="lead">
+        Please do not attach drawings, BOM or CAD files at this stage. We will arrange a secure
+        exchange once an NDA is in place.
+      </p>
+    </div>
+
+    <form class="form reveal" id="enquiryForm" novalidate>
+      <div class="field">
+        <label for="company">Company name *</label>
+        <input type="text" id="company" name="company" required autocomplete="organization">
+      </div>
+      <div class="field">
+        <label for="contact">Contact person *</label>
+        <input type="text" id="contact" name="contact" required autocomplete="name">
+      </div>
+      <div class="field">
+        <label for="email">Company email *</label>
+        <input type="email" id="email" name="email" required autocomplete="email">
+      </div>
+      <div class="field">
+        <label for="country">Country / region *</label>
+        <input type="text" id="country" name="country" required autocomplete="country-name">
+      </div>
+
+      <div class="field">
+        <label for="ptype">Product type *</label>
+        <select id="ptype" name="ptype" required>
+          <option value="">Please select</option>
+          <option>Mobile &amp; device accessories</option>
+          <option>Wireless charging</option>
+          <option>Automotive parts &amp; accessories</option>
+          <option>Other consumer electronics</option>
+          <option>Plastic, hardware &amp; electronics integration</option>
+          <option>Other</option>
+        </select>
+      </div>
+      <div class="field">
+        <label for="stage">Current development stage *</label>
+        <select id="stage" name="stage" required>
+          <option value="">Please select</option>
+          <option>Idea / concept only</option>
+          <option>Early design or sketches</option>
+          <option>Complete product data, ready for tooling</option>
+          <option>Existing product, looking to customise</option>
+          <option>Existing product, looking to transfer production</option>
+        </select>
+      </div>
+      <div class="field">
+        <label for="services">Services needed *</label>
+        <select id="services" name="services" required>
+          <option value="">Please select</option>
+          <option>Product planning &amp; design</option>
+          <option>Mechanical &amp; electronics engineering</option>
+          <option>Prototyping, DFM &amp; tooling</option>
+          <option>Plastic injection &amp; manufacturing</option>
+          <option>Assembly, testing &amp; quality</option>
+          <option>Supply chain &amp; delivery</option>
+          <option>Full programme, concept to mass production</option>
+        </select>
+      </div>
+      <div class="field">
+        <label for="volume">Estimated annual volume</label>
+        <input type="text" id="volume" name="volume" placeholder="e.g. 20,000 pcs / year">
+      </div>
+      <div class="field">
+        <label for="market">Target market</label>
+        <input type="text" id="market" name="market" placeholder="e.g. EU retail, US e-commerce">
+      </div>
+      <div class="field">
+        <label for="launch">Planned launch date</label>
+        <input type="text" id="launch" name="launch" placeholder="e.g. Q3 2027">
+      </div>
+
+      <div class="field is-wide">
+        <label for="summary">Project summary *</label>
+        <textarea id="summary" name="summary" required
+          placeholder="What is the product, what has to change or be developed, and what is driving the timing?"></textarea>
+      </div>
+
+      <div class="field is-wide">
+        <label for="nda">Do you require an NDA before further discussion?</label>
+        <select id="nda" name="nda">
+          <option>Yes — please send your NDA</option>
+          <option>Yes — we will send ours</option>
+          <option>Not at this stage</option>
+        </select>
+      </div>
+
+      <p class="form__note">
+        Fields marked * are required. We use this information to route your enquiry to the right team
+        and to prepare a first response. MOQ and lead time are evaluated based on the product,
+        material, tooling complexity and order volume.
+      </p>
+
+      <div class="form__actions">
+        <button class="btn" type="submit" id="enquirySubmit">Send Enquiry <span class="arrow">→</span></button>
+        <a class="tlink" href="mailto:sales@comart.com.tw">Or email sales@comart.com.tw <span>→</span></a>
+      </div>
+
+      <p class="placeholder-flag is-wide" id="formNote" style="grid-column:1/-1">
+        設計稿說明：表單後端（驗證、寫入、Email 通知）尚未建置，送出鍵目前不會傳送任何資料。
+        接上後端前請使用 sales@comart.com.tw。
+      </p>
+    </form>
+  </div>
+</section>
+
+<!-- ============ 第二階段說明 ============ -->
+<section class="section on-dark">
+  <div class="wrap">
+    <div class="section-head reveal">
+      <span class="eyebrow">Step 2 — After we talk</span>
+      <h2>Confidential data, exchanged properly.</h2>
+      <p class="lead">
+        Once our sales team has confirmed the project and both sides want to proceed, we put an NDA
+        in place and exchange technical data through a secure channel.
+      </p>
+    </div>
+    <ul class="speclist reveal" style="margin-top:44px">
+      <li><b>2D / 3D drawings</b>Exchanged after NDA, through a secure channel rather than email attachments.</li>
+      <li><b>BOM</b>Component list and sourcing constraints.</li>
+      <li><b>Technical specifications</b>Performance, tolerance and material requirements.</li>
+      <li><b>Test &amp; certification requirements</b>What has to be proven, and to which standard and market.</li>
+    </ul>
+  </div>
+</section>
+
+<!-- ============ 聯絡資訊 ============ -->
+<section class="section">
+  <div class="wrap">
+    <div class="section-head reveal">
+      <span class="eyebrow">Direct contact</span>
+      <h2>Or reach the team directly.</h2>
+    </div>
+    <ul class="speclist reveal" style="margin-top:40px;grid-template-columns:repeat(3,1fr)">
+      <li><b>Taiwan — Headquarters</b>
+        COMART CORPORATION<br>
+        <a href="tel:+886289111133">+886-2-8911-1133</a><br>
+        <a href="mailto:sales@comart.com.tw">sales@comart.com.tw</a>
+      </li>
+      <li><b>China — Dongguan</b>
+        ETERNAL GAIN PLASTICS CO., LTD.<br>
+        <a href="tel:+8676923064133">+86-769-2306-4133</a>
+      </li>
+      <li><b>Vietnam — Bac Giang</b>
+        COMART VIETNAM CO., LTD.<br>
+        <a href="tel:+842043561133">+84-204-356-1133</a>
+      </li>
+    </ul>
+  </div>
+</section>
+
+
+<!-- ============ FOOTER ============ -->
+<footer class="footer">
+  <div class="wrap">
+    <div class="footer__top">
+      <div class="footer__brand">
+        <img src="../assets/img/comart-logo.png" alt="COMART">
+        <p class="footer__tag">Innovative ODM reliable partner</p>
+        <p class="footer__since">Since 1994 · Taiwan · China · Vietnam</p>
+      </div>
+
+      <div class="foot-site">
+        <h4>Taiwan — Headquarters</h4>
+        <p class="entity">COMART CORPORATION<br>怡業股份有限公司</p>
+        <address>3F., No. 12, Ln. 235, Baoqiao Rd.,<br>Xindian Dist., New Taipei City 231028, Taiwan (R.O.C.)</address>
+        <p class="contact">
+          <a href="tel:+886289111133">+886-2-8911-1133</a><br>
+          <a href="mailto:sales@comart.com.tw">sales@comart.com.tw</a>
+        </p>
+      </div>
+
+      <div class="foot-site">
+        <h4>China — Dongguan</h4>
+        <p class="entity">ETERNAL GAIN PLASTICS CO., LTD.<br>東莞恒群塑膠有限公司</p>
+        <address>Room 501, Building 1, No. 2 An Yue Road,<br>Cha Shan Town, Dongguan City, Guangdong 523000, China</address>
+        <p class="contact">
+          <a href="tel:+8676923064133">+86-769-2306-4133</a>
+        </p>
+      </div>
+
+      <div class="foot-site">
+        <h4>Vietnam — Bac Giang</h4>
+        <p class="entity">COMART VIETNAM CO., LTD.<br>越南怡業責任有限公司</p>
+        <address>Lot CN 06-06, Van Trung Industrial Zone,<br>Viet Yen District, Bac Giang Province 26171, Vietnam</address>
+        <p class="contact">
+          <a href="tel:+842043561133">+84-204-356-1133</a>
+        </p>
+      </div>
+    </div>
+
+    <nav class="footer__nav" aria-label="Footer">
+      <a href="../services/">Services</a>
+      <a href="../global-operations/">Global Operations</a>
+      <a href="../products/">Products</a>
+      <a href="../quality-compliance/">Quality &amp; Compliance</a>
+      <a href="../equipment/">Equipment</a>
+      <a href="../company/">Company</a>
+      <a href="../start-your-project/">Start Your Project</a>
+    </nav>
+
+    <div class="footer__bottom">
+      <span>© 1994–2026 COMART CORPORATION. All rights reserved.</span>
+      <span>Privacy Policy · Terms of Use</span>
+    </div>
+  </div>
+</footer>
+
+
+<script src="../assets/js/site.js"></script>
+</body>
+</html>

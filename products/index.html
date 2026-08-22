@@ -1,0 +1,239 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Products — Platform Products & Quick Customization | COMART</title>
+<meta name="description" content="Two routes to your own product: validated platform products that can be extended or combined, and quick customization of existing products through logo, colour, appearance and packaging.">
+<link rel="canonical" href="https://comartgroup.github.io/www/products/">
+<meta property="og:title" content="Products — Platform Products & Quick Customization | COMART">
+<meta property="og:description" content="Two routes to your own product: validated platform products that can be extended or combined, and quick customization of existing products through logo, colour, appearance and packaging.">
+<meta property="og:type" content="website">
+<meta property="og:image" content="../assets/img/hero-tooling.jpg">
+<link rel="icon" type="image/png" href="../assets/img/favicon.png">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Archivo:wdth,wght@75..125,400..800&family=Inter:wght@300..700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="../assets/css/site.css">
+</head>
+<body class="">
+
+<!-- ============ HEADER ============ -->
+<header class="header" id="header">
+  <div class="wrap">
+    <a class="brand" href="../" aria-label="COMART home">
+      <img src="../assets/img/comart-logo.png" alt="COMART">
+    </a>
+
+    <nav class="nav" aria-label="Primary">
+      <a href="../services/"          data-nav="services">Services</a>
+      <a href="../global-operations/" data-nav="operations">Global Operations</a>
+      <a href="../products/"          data-nav="products" class="is-current">Products</a>
+      <a href="../quality-compliance/" data-nav="quality">Quality</a>
+      <a href="../equipment/"         data-nav="equipment">Equipment</a>
+      <a href="../company/"           data-nav="company">Company</a>
+    </nav>
+
+    <div class="lang" aria-label="Language">
+      <a href="../" class="is-active" hreflang="en">EN</a>
+      <span class="is-soon" title="繁體中文版本準備中">繁中</span>
+      <span class="is-soon" title="Phiên bản tiếng Việt đang chuẩn bị">VN</span>
+    </div>
+
+    <a class="btn" href="../start-your-project/">Start Your Project <span class="arrow">→</span></a>
+
+    <button class="burger" id="burger" aria-label="Menu" aria-expanded="false">
+      <span></span><span></span><span></span>
+    </button>
+  </div>
+</header>
+
+<div class="mobile-menu" id="mobileMenu">
+  <a href="../services/">Services</a>
+  <a href="../global-operations/">Global Operations</a>
+  <a href="../products/">Products</a>
+  <a href="../quality-compliance/">Quality &amp; Compliance</a>
+  <a href="../equipment/">Equipment</a>
+  <a href="../company/">Company</a>
+  <a href="../start-your-project/">Start Your Project</a>
+  <div class="mm-lang"><a href="../">EN</a><span class="is-soon">繁體中文</span><span class="is-soon">Tiếng Việt</span></div>
+</div>
+
+
+<!-- ============ PAGE HERO ============ -->
+<section class="page-hero">
+  <div class="page-hero__media"><img src="../assets/img/molding-line.jpg" alt=""></div>
+  <div class="wrap">
+    <nav class="crumbs" aria-label="Breadcrumb">
+      <a href="../">Home</a> <span>/</span> <span>Products</span>
+    </nav>
+    <h1>Two routes to your own product.</h1>
+    <p class="page-hero__lead">
+      Develop something new with us, or start from a product that is already proven in production
+      and make it yours.
+    </p>
+    <div class="page-hero__meta">
+      <span>Platform Products</span>
+      <span>Quick Customization</span>
+    </div>
+  </div>
+</section>
+
+<!-- ============ 雙入口 ============ -->
+<section class="section products on-dark">
+  <div class="wrap">
+    <div class="prod-grid">
+      <article class="prod reveal">
+        <span class="tag">Route A</span>
+        <h3>Platform Products</h3>
+        <p>
+          Validated product platforms that can be extended, re-designed or combined into your own
+          model — with the engineering groundwork already done and the tooling risk already taken.
+        </p>
+        <ul>
+          <li>Proven structure</li>
+          <li>Extendable design</li>
+          <li>Shorter validation</li>
+        </ul>
+        <div><a class="tlink" href="#catalogue">Browse Platform Products <span>→</span></a></div>
+      </article>
+      <article class="prod reveal">
+        <span class="tag">Route B</span>
+        <h3>Quick Customization Products</h3>
+        <p>
+          A shorter path for brands that need their own SKU quickly: logo, colour, appearance and
+          packaging customisation on products that are already in production.
+        </p>
+        <ul>
+          <li>Logo &amp; colour</li>
+          <li>Appearance</li>
+          <li>Packaging</li>
+        </ul>
+        <div><a class="tlink" href="#catalogue">Browse Quick Customization <span>→</span></a></div>
+      </article>
+    </div>
+  </div>
+</section>
+
+<!-- ============ 產品清單（資料層） ============ -->
+<section class="section" id="catalogue">
+  <div class="wrap">
+    <div class="section-head reveal">
+      <span class="eyebrow">Catalogue</span>
+      <h2>Products available for development.</h2>
+      <p class="lead">
+        Filter by category and route. Full specifications, tooling status and pricing are provided
+        by your sales contact after we understand your volume and destination market.
+      </p>
+    </div>
+
+    <div class="prod-filters reveal" id="prodFilters" hidden>
+      <button class="chip is-on" data-filter="all">All</button>
+    </div>
+
+    <div class="prod-catalogue" id="prodGrid" aria-live="polite">
+      <p class="prod-state">Loading products…</p>
+    </div>
+
+    <p class="placeholder-flag reveal" id="prodSourceNote">
+      設計稿說明：本區的產品資料目前來自範例檔 <code>assets/data/products.sample.json</code>，
+      尚未連接報價系統的 <code>products</code> 資料表。正式串接方式見 <code>docs/DATA.md</code>。
+    </p>
+  </div>
+</section>
+
+<!-- ============ 型錄下載 ============ -->
+<section class="section on-dark">
+  <div class="wrap">
+    <div class="section-head reveal">
+      <span class="eyebrow">Catalogue download</span>
+      <h2>Prefer the printed catalogue?</h2>
+      <p class="lead">
+        Our current product catalogue is available for download. Capability statements and full
+        certification documents are provided by your sales contact.
+      </p>
+    </div>
+    <div class="row" style="margin-top:36px;display:flex;flex-wrap:wrap;gap:14px">
+      <a class="btn btn--ghost" href="../start-your-project/">Request Catalogue <span class="arrow">→</span></a>
+    </div>
+  </div>
+</section>
+
+<!-- ============ END CTA ============ -->
+<section class="endcta">
+  <div class="wrap">
+    <h2>Found something close to what you need?</h2>
+    <p>
+      Tell us which product and what has to change. We will tell you whether it is a customisation,
+      a derivative or a new development — and what each option costs you in time.
+    </p>
+    <div class="row">
+      <a class="btn" href="../start-your-project/">Start Your Project <span class="arrow">→</span></a>
+      <a class="btn btn--ghost" href="../services/">How We Work <span class="arrow">→</span></a>
+    </div>
+  </div>
+</section>
+
+<script src="../assets/js/products.js" defer></script>
+
+
+<!-- ============ FOOTER ============ -->
+<footer class="footer">
+  <div class="wrap">
+    <div class="footer__top">
+      <div class="footer__brand">
+        <img src="../assets/img/comart-logo.png" alt="COMART">
+        <p class="footer__tag">Innovative ODM reliable partner</p>
+        <p class="footer__since">Since 1994 · Taiwan · China · Vietnam</p>
+      </div>
+
+      <div class="foot-site">
+        <h4>Taiwan — Headquarters</h4>
+        <p class="entity">COMART CORPORATION<br>怡業股份有限公司</p>
+        <address>3F., No. 12, Ln. 235, Baoqiao Rd.,<br>Xindian Dist., New Taipei City 231028, Taiwan (R.O.C.)</address>
+        <p class="contact">
+          <a href="tel:+886289111133">+886-2-8911-1133</a><br>
+          <a href="mailto:sales@comart.com.tw">sales@comart.com.tw</a>
+        </p>
+      </div>
+
+      <div class="foot-site">
+        <h4>China — Dongguan</h4>
+        <p class="entity">ETERNAL GAIN PLASTICS CO., LTD.<br>東莞恒群塑膠有限公司</p>
+        <address>Room 501, Building 1, No. 2 An Yue Road,<br>Cha Shan Town, Dongguan City, Guangdong 523000, China</address>
+        <p class="contact">
+          <a href="tel:+8676923064133">+86-769-2306-4133</a>
+        </p>
+      </div>
+
+      <div class="foot-site">
+        <h4>Vietnam — Bac Giang</h4>
+        <p class="entity">COMART VIETNAM CO., LTD.<br>越南怡業責任有限公司</p>
+        <address>Lot CN 06-06, Van Trung Industrial Zone,<br>Viet Yen District, Bac Giang Province 26171, Vietnam</address>
+        <p class="contact">
+          <a href="tel:+842043561133">+84-204-356-1133</a>
+        </p>
+      </div>
+    </div>
+
+    <nav class="footer__nav" aria-label="Footer">
+      <a href="../services/">Services</a>
+      <a href="../global-operations/">Global Operations</a>
+      <a href="../products/">Products</a>
+      <a href="../quality-compliance/">Quality &amp; Compliance</a>
+      <a href="../equipment/">Equipment</a>
+      <a href="../company/">Company</a>
+      <a href="../start-your-project/">Start Your Project</a>
+    </nav>
+
+    <div class="footer__bottom">
+      <span>© 1994–2026 COMART CORPORATION. All rights reserved.</span>
+      <span>Privacy Policy · Terms of Use</span>
+    </div>
+  </div>
+</footer>
+
+
+<script src="../assets/js/site.js"></script>
+</body>
+</html>

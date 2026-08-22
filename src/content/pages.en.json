@@ -1,0 +1,106 @@
+{
+  "_comment": "頁面清冊：對應規劃書 v2.3 第四章網站主架構。out = 產生位置，src = src/pages/ 底下的內容檔，nav = 主選單高亮的項目。",
+  "lang": "en",
+  "pages": [
+    {
+      "out": "index.html",
+      "src": "home.html",
+      "nav": null,
+      "title": "COMART — From Product Concept to Mass Production | ODM / OEM Partner",
+      "desc": "COMART is an ODM/OEM partner for consumer electronics and automotive accessory brands. One team covers product planning, design, mechanical and electronics engineering, tooling, plastic injection, assembly, testing and supply chain delivery across Taiwan, China and Vietnam."
+    },
+
+    {
+      "out": "services/index.html",
+      "src": "services.html",
+      "nav": "services",
+      "title": "Services — Six Stages from Concept to Mass Production | COMART",
+      "desc": "COMART's services are organised around your product development process: planning and design, mechanical and electronics engineering, prototyping and tooling, plastic injection, assembly and testing, and supply chain delivery."
+    },
+    {
+      "out": "services/product-planning-design/index.html",
+      "src": "services-planning.html",
+      "nav": "services",
+      "title": "Product Planning & Design | COMART Services",
+      "desc": "User scenario and product requirement definition, product planning, industrial design, preliminary material and process advice, target cost and volume feasibility."
+    },
+    {
+      "out": "services/mechanical-electronics-engineering/index.html",
+      "src": "services-engineering.html",
+      "nav": "services",
+      "title": "Mechanical & Electronics Engineering | COMART Services",
+      "desc": "Mechanical design, material and structure selection, electronic system planning, circuit design, firmware development, test planning, and PCB/PCBA and certification partner management."
+    },
+    {
+      "out": "services/prototyping-dfm-tooling/index.html",
+      "src": "services-tooling.html",
+      "nav": "services",
+      "title": "Prototyping, DFM & Tooling | COMART Services",
+      "desc": "Appearance and functional prototypes, DFM/DFMA review, mould design, mould flow, parting, gating and ejection planning, T1 trials and mould revision, acceptance and transfer to production."
+    },
+    {
+      "out": "services/plastic-injection-manufacturing/index.html",
+      "src": "services-injection.html",
+      "nav": "services",
+      "title": "Plastic Injection & Manufacturing | COMART Services",
+      "desc": "Engineering plastics and elastomers, injection tonnage and part size range, two-shot and over-moulding, process stability and parameter management, pilot run and mass production."
+    },
+    {
+      "out": "services/assembly-testing-quality/index.html",
+      "src": "services-assembly.html",
+      "nav": "services",
+      "title": "Assembly, Testing & Quality | COMART Services",
+      "desc": "Assembly and packaging, work instructions and process control, functional, reliability and environmental testing, quality inspection and records, third-party laboratory coordination."
+    },
+    {
+      "out": "services/supply-chain-delivery/index.html",
+      "src": "services-supply-chain.html",
+      "nav": "services",
+      "title": "Supply Chain & Delivery | COMART Services",
+      "desc": "Material and sub-supplier management, production allocation between China and Vietnam, pilot run to mass production transfer, packaging and shipment coordination, delivery and quality project management."
+    },
+
+    {
+      "out": "global-operations/index.html",
+      "src": "global-operations.html",
+      "nav": "operations",
+      "title": "Global Operations — One Team Across Taiwan, China and Vietnam | COMART",
+      "desc": "COMART operates as one team across Taiwan, China and Vietnam. We propose the production setup based on your product maturity, process, cost, lead time, country of origin and export requirements."
+    },
+    {
+      "out": "products/index.html",
+      "src": "products.html",
+      "nav": "products",
+      "title": "Products — Platform Products & Quick Customization | COMART",
+      "desc": "Two routes to your own product: validated platform products that can be extended or combined, and quick customization of existing products through logo, colour, appearance and packaging."
+    },
+    {
+      "out": "quality-compliance/index.html",
+      "src": "quality-compliance.html",
+      "nav": "quality",
+      "title": "Quality & Compliance | COMART",
+      "desc": "Control points from incoming material to outgoing shipment, reliability and environmental testing, third-party laboratory coordination, and group-level certifications including ISO 9001, ISO 14001, amfori BSCI, Sedex/SMETA and Apple MFi."
+    },
+    {
+      "out": "equipment/index.html",
+      "src": "equipment.html",
+      "nav": "equipment",
+      "title": "Equipment | COMART",
+      "desc": "COMART's manufacturing, tooling, assembly and testing equipment across our China and Vietnam operations."
+    },
+    {
+      "out": "company/index.html",
+      "src": "company.html",
+      "nav": "company",
+      "title": "Company — About COMART, Milestones and News | COMART",
+      "desc": "COMART has been developing and manufacturing consumer electronics and automotive accessories since 1994, with over 200 employees and more than 100 patents granted to date."
+    },
+    {
+      "out": "start-your-project/index.html",
+      "src": "start-your-project.html",
+      "nav": null,
+      "title": "Start Your Project | COMART",
+      "desc": "Tell us where your product stands today. Send us your product stage, application, target market and volume expectation, and we will come back with a development route and the right people from our team."
+    }
+  ]
+}

@@ -9,3 +9,6 @@
 # 暫存與預覽檔
 _preview-*.html
 *.log
+
+# 產生器與後台的臨時測試檔
+_test.html

@@ -1,33 +1,54 @@
-# COMART 官網 — 首頁設計稿
+# COMART 官網
 
-COMART CORPORATION 新官網的**首頁**單頁設計稿（英文版）。
-內容依據 `COMART_官網重建規劃.md` v2.2，品牌色取自 COMART CIS（PANTONE 1805C）。
+COMART CORPORATION 新官網。內容依據 `COMART_官網重建規劃.md` v2.3，
+品牌色取自 COMART CIS（PANTONE 1805C）。
 
-## 檔案結構
+線上測試站：https://comartgroup.github.io/www/
+
+## 結構
 
 ```
-index.html              首頁全部內容
-assets/css/site.css     設計系統：品牌色、字級、版型、RWD
-assets/js/site.js       固定選單、手機選單、進場動畫
-assets/img/             實拍照片、Logo、favicon
+build.py                 靜態產生器（無需 npm / CI）
+src/
+  layout.html            頁面外殼
+  partials/              頁首、頁尾（只維護一份）
+  pages/                 各頁內容
+  content/pages.en.json  頁面清冊：路徑、標題、SEO 描述
+assets/                  CSS、JS、圖片、範例資料
+admin/                   官網後台（內容管理）
+docs/DATA.md             資料架構與串接說明
+docs/sql/web_schema.sql  Supabase 資料表與公開 view
+index.html 等            build.py 產生的結果，直接由 GitHub Pages 服務
 ```
+
+## 修改內容
+
+改 `src/` 底下的檔案，然後重新產生：
+
+```bash
+python3 build.py
+```
+
+**不要直接改根目錄的 `index.html` 或 `services/index.html` 等檔案** ——
+那些是產生結果，下次 build 會被覆蓋。
 
 ## 本機預覽
 
 ```bash
 python3 -m http.server 8899
-# 瀏覽器開 http://localhost:8899/
+# http://localhost:8899/
 ```
-
-資源全為相對路徑，直接用瀏覽器開 `index.html` 也可以（字體需連 Google Fonts）。
 
 ## 目前狀態
 
-- 只有首頁，且只有英文版；繁體中文與越南文版本尚未製作
-- Company News 為版位示意，尚未填入真實內容
-- 未接資料庫、未接表單、未部署
-- 語言切換鈕為視覺示意，尚未連結
+| 項目 | 狀態 |
+|---|---|
+| 英文版 14 頁 | 已完成 |
+| 繁體中文、越南文 | 未開始（`build.py` 的 `LANGS` 已預留） |
+| 產品清單 | 讀範例資料，未接報價系統 |
+| 後台 `admin/` | 離線示範模式，資料存 localStorage |
+| 詢價表單 | 未接後端 |
+| Equipment 詳細設備 | 待由 `Comart Corp. introduction 20251020` 匯入 |
+| Company News | 版位示意，待真實內容 |
 
-## 尚未採用的舊站資料
-
-依規劃書 15.7，網站不刊登固定 MOQ 與交期，因此舊站的「MOQ 1,000 pcs」「35 天交期」「模具 30 天」未沿用，統一表述為依產品、材料、模具複雜度及訂單數量評估。
+詳細串接步驟見 [docs/DATA.md](docs/DATA.md)。
