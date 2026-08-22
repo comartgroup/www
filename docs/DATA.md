@@ -83,6 +83,7 @@ Edge Function，才能做驗證、防濫用與 Email 通知。
 | 詢價表單送出 | 已部署並實測通過（瀏覽器端到端） |
 | 自動翻譯 | 已部署，需登入且在 web_editors 名單內才能呼叫 |
 | 使用者管理 | 已部署 |
+| 後台「頁面內容」 | **尚未與前台同步**——編輯只存進 `web_pages`，不改變線上網站 |
 | 詢價通知信 | 待設 `RESEND_API_KEY`；資料無論如何都會寫入 |
 
 ---
@@ -216,3 +217,43 @@ supabase secrets set NOTIFY_FROM="COMART Website <noreply@send.comart.com.tw>" \
 
 `enquiry` 函式先寫入 `web_enquiries` 才寄信。寄信失敗只會記在 log，
 客戶端一律看到成功訊息——因為資料確實收到了。所有詢價都可從後台「詢價紀錄」查閱。
+
+---
+
+## 八、已知缺口：頁面文案尚未與前台同步
+
+### 現況
+
+前台各頁的文字是 `build.py` 產生時寫死在 HTML 裡的，來源是 repo 的 `src/pages/`：
+
+```
+src/pages/*.html  →  build.py  →  靜態頁面  →  commit  →  GitHub Pages
+```
+
+前台會即時讀資料庫的只有兩處：
+
+| 前端 | 資料來源 | 是否即時 |
+|---|---|---|
+| `assets/js/news.js` | `web_news` | 是，後台發布即生效 |
+| `assets/js/products.js` | `web_products_public` | 是，後台勾選即生效 |
+| 各頁標題與導言 | `src/pages/`（靜態） | **否** |
+
+`web_pages` 目前沒有任何前端讀取。後台「頁面內容」可以編輯與儲存，但線上不會改變。
+
+### 為什麼這樣分
+
+「條目型」內容（動態、產品）會持續新增、需要即時上線，做成前端即時讀取。
+「編輯型」內容（頁面文案）改動少、對 SEO 敏感、需要審核，適合建置時注入。
+兩者的處理方式本來就不同，只是後者的前台端尚未完成。
+
+### 決定（2026-08-22 Woody）
+
+文案改動頻率不高，暫由開發端維護。**後台模組保留**，用意是先把資料結構與
+三語欄位定下來，介面上已明確標註未同步（側邊欄徽章、清單頂部、編輯面板內）。
+
+### 下一階段要做的
+
+1. `build.py` 產生時從 `web_pages` 取值注入
+2. GitHub Actions workflow：跑 build.py、自動 commit、觸發 Pages 重建
+3. 後台加「發布」按鈕，經 Edge Function 觸發該 workflow
+   （需要一組僅能觸發 workflow 的 GitHub token，存 Edge Function secret，不進 repo）

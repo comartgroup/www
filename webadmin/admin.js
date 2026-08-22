@@ -253,6 +253,8 @@
           (pages && pages.length === 0
             ? '<div class="note"><b>web_pages 是空的。</b>到「頁面內容」按一次「建立頁面清單」即可初始化。</div>'
             : "") +
+          '<div class="note note--warn"><b>「頁面內容」尚未與前台同步。</b>該區的編輯只存進資料庫，' +
+          "不會改變線上網站；前台文案目前由開發端維護。News 與產品上架則是即時生效。</div>" +
           '<div class="note"><b>三語進度。</b>英文為主稿。繁中與越南文可用欄位下方的「從英文自動翻譯」產生，' +
           "翻完務必人工確認再儲存——翻譯是草稿，不是定稿。</div>" +
           '<div class="note"><b>產品資料。</b>產品主檔在報價系統，這裡只決定哪些出現在官網，' +
@@ -275,11 +277,27 @@
       busy();
       SB.db.select("web_pages", { select: "*", order: "id.asc" }).then(function (rows) {
         if (!rows.length) {
-          body.innerHTML = '<div class="panel"><div class="panel__body"><div class="empty">' +
-            "web_pages 目前沒有資料。按右上角「建立頁面清單」寫入 8 個頁面。</div></div></div>";
+          body.innerHTML = '<div class="panel"><div class="panel__body">' +
+          '<div class="note note--warn"><b>此區目前尚未與前台同步。</b>' +
+          "在這裡的編輯會存進資料庫，但<b>不會改變線上網站</b>。" +
+          "前台各頁的文案目前寫在 repo 的 <code>src/pages/</code>，由建置程式產生靜態頁面，" +
+          "改動頻率低，暫由開發端維護。" +
+          "<br><br>本區保留是為了先把資料結構與三語欄位定下來，" +
+          "前台同步（build 時從資料庫取值＋後台發布按鈕）列為下一階段開發項目。</div>" +
+          "</div></div>" +
+          '<div class="panel"><div class="panel__body"><div class="empty">' +
+            "web_pages 目前沒有資料。按右上角「建立頁面清單」寫入頁面。</div></div></div>";
           return;
         }
-        body.innerHTML = '<div class="panel"><div class="panel__head"><div><h3>網站頁面</h3><p>共 ' +
+        body.innerHTML = '<div class="panel"><div class="panel__body">' +
+          '<div class="note note--warn"><b>此區目前尚未與前台同步。</b>' +
+          "在這裡的編輯會存進資料庫，但<b>不會改變線上網站</b>。" +
+          "前台各頁的文案目前寫在 repo 的 <code>src/pages/</code>，由建置程式產生靜態頁面，" +
+          "改動頻率低，暫由開發端維護。" +
+          "<br><br>本區保留是為了先把資料結構與三語欄位定下來，" +
+          "前台同步（build 時從資料庫取值＋後台發布按鈕）列為下一階段開發項目。</div>" +
+          "</div></div>" +
+          '<div class="panel"><div class="panel__head"><div><h3>網站頁面</h3><p>共 ' +
           rows.length + ' 頁</p></div></div><table><thead><tr><th>頁面</th><th>狀態</th><th></th></tr></thead><tbody>' +
           rows.map(function (p) {
             return "<tr><td><b>" + esc(p.name) + '</b><span class="sub">' + esc(p.path) + "</span></td><td>" +
@@ -526,6 +544,7 @@
       "</h3><p>" + esc(p.path) + "</p></div>" +
       '<label class="switch"><input type="checkbox" id="pgLive"' + (p.status === "live" ? " checked" : "") +
       '><span class="track"></span>已上線</label></div><div class="panel__body" id="pgFields">' +
+      '<div class="note note--warn" style="margin-bottom:24px">儲存後<b>不會反映到線上網站</b>——本區尚未與前台同步。</div>' +
       seed.fields.map(function (f) {
         return langBlock("page", f, FIELD_LABEL[f] || f,
                          f === "lead" || f === "hero_sub", (p.content || {})[f]);
