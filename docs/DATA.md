@@ -82,6 +82,7 @@ Edge Function，才能做驗證、防濫用與 Email 通知。
 | 後台登入 | Supabase Auth 密碼登入，**尚未建立任何使用者帳號** |
 | 詢價表單送出 | Edge Function 程式碼完成，**尚未部署**，前台尚未接上送出邏輯 |
 | 自動翻譯 | Edge Function 程式碼完成，**尚未部署** |
+| 使用者管理 | 後台介面完成；`admin-users` Edge Function **尚未部署** |
 
 ---
 
@@ -113,6 +114,20 @@ repo 與 GitHub Pages 都是公開的，只能使用受 RLS 保護的 publishabl
 未列名者不得寫入任何 `web_*` 資料表，也不能讀取詢價案件的客戶個資。
 
 執行順序：`web_schema.sql` → `web_schema_02_admin.sql` → `web_schema_03_editors.sql`
+
+### 使用者管理
+
+後台「使用者」分頁管理 `web_editors` 白名單。四種權限：
+`admin`（含使用者管理）、`editor`（頁面與動態）、`product`（只管上架）、`publisher`（切換上線狀態）。
+
+建立帳號與設定密碼需要 service_role，因此經 `admin-users` Edge Function 處理，
+函式內會先確認呼叫者是 `web_editors` 裡的 admin。
+
+**「收回權限」只把人移出白名單，不會刪除 auth 帳號。**
+本專案為多系統共用，該 UUID 可能被 KMS 或 CPF 參照，刪除會造成孤兒資料。
+
+專案沒有設定寄信服務，所以新增使用者與重設密碼都不寄信，
+而是在畫面上顯示一次臨時密碼，由管理者自行轉達。
 
 接上正式資料庫時必須確認：
 

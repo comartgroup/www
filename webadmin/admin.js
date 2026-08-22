@@ -63,6 +63,7 @@
     if (e && e.status === 401) hint = "登入已過期，請重新登入。";
     else if (e && e.status === 404) hint = "資料表或 view 不存在——docs/sql/ 底下的 SQL 可能還沒執行。";
     else if (e && e.status === 403) hint = "權限不足：這個帳號的 RLS 政策不允許此操作。";
+    else if (e && !e.status) hint = "連不到伺服器。若這是 Edge Function，代表尚未部署；否則請檢查網路。";
     body.innerHTML = '<div class="panel"><div class="panel__body">' +
       '<div class="note"><b>' + esc(what) + '失敗。</b>' + esc(hint || (e && e.message) || "未知錯誤") +
       "</div></div></div>";
@@ -133,7 +134,7 @@
             state.textContent = "完成，請人工確認後再儲存";
           })
           .catch(function (err) {
-            state.textContent = err.status === 404
+            state.textContent = (err.status === 404 || !err.status)
               ? "translate function 尚未部署"
               : "翻譯失敗：" + (err.message || "");
           })
@@ -148,6 +149,70 @@
                                   '"] [data-lang="' + el.dataset.lang + '"] .dot');
       if (dot) dot.classList.toggle("is-full", el.value.trim().length > 0);
     });
+  }
+
+  var ROLE_OPTS = [
+    ["admin",     "管理者 — 含使用者管理"],
+    ["editor",    "內容編輯 — 頁面與動態"],
+    ["product",   "產品編輯 — 只管上架"],
+    ["publisher", "發布者 — 可切換上線狀態"]
+  ];
+
+  function showTempPassword(email, pw) {
+    if (!pw) return;
+    var host = $("#userForm") || body;
+    host.innerHTML = '<div class="panel"><div class="panel__head"><div><h3>臨時密碼</h3>' +
+      "<p>只會顯示這一次，關掉就看不到了</p></div></div>" +
+      '<div class="panel__body">' +
+      (email ? '<div class="fieldrow"><label>帳號</label><input type="text" value="' +
+               esc(email) + '" readonly></div>' : "") +
+      '<div class="fieldrow"><label>臨時密碼</label>' +
+      '<input type="text" value="' + esc(pw) + '" readonly id="tmpPw"></div>' +
+      '<div class="note"><b>請自行轉達給對方，不要用 email 寄。</b>' +
+      "本專案沒有設定寄信服務，系統不會通知對方。請要求對方登入後立即更改密碼。</div>" +
+      '<div class="rowactions"><button class="btn" id="copyPw">複製</button>' +
+      '<span class="saved" id="pwCopied">已複製</span></div></div></div>';
+    host.scrollIntoView({ behavior: "smooth", block: "start" });
+    $("#copyPw").onclick = function () {
+      var el = $("#tmpPw"); el.select();
+      navigator.clipboard.writeText(el.value).then(function () { flash($("#pwCopied"), "已複製"); });
+    };
+  }
+
+  function renderUserForm() {
+    var host = $("#userForm");
+    host.innerHTML = '<div class="panel"><div class="panel__head"><div><h3>新增使用者</h3>' +
+      "<p>帳號已存在於其他系統時，請選「加入既有帳號」</p></div></div>" +
+      '<div class="panel__body">' +
+      '<div class="fieldrow"><label>Email</label>' +
+      '<input type="email" id="nuEmail" placeholder="name@comart.com.tw"></div>' +
+      '<div class="fieldrow"><label>權限</label><select id="nuRole">' +
+      ROLE_OPTS.map(function (o) { return '<option value="' + o[0] + '">' + o[1] + "</option>"; }).join("") +
+      "</select></div>" +
+      '<div class="rowactions">' +
+      '<button class="btn btn--primary" id="nuCreate">建立新帳號</button>' +
+      '<button class="btn" id="nuGrant">加入既有帳號</button>' +
+      '<span class="saved" id="nuState"></span></div></div></div>';
+    host.scrollIntoView({ behavior: "smooth", block: "start" });
+
+    function run(action) {
+      var email = $("#nuEmail").value.trim();
+      if (!email) { flash($("#nuState"), "請輸入 Email"); return; }
+      var role = $("#nuRole").value;
+      $("#nuCreate").disabled = $("#nuGrant").disabled = true;
+      SB.fn.users(action, { email: email, role: role })
+        .then(function (r) {
+          if (r.temp_password) showTempPassword(email, r.temp_password);
+          else { flash($("#nuState"), "已加入"); views.users(); }
+        })
+        .catch(function (err) {
+          var m = (err.body && err.body.message) || err.message || "";
+          flash($("#nuState"), m);
+          $("#nuCreate").disabled = $("#nuGrant").disabled = false;
+        });
+    }
+    $("#nuCreate").onclick = function () { run("create"); };
+    $("#nuGrant").onclick  = function () { run("grant"); };
   }
 
   /* ---------- 各分頁 ---------- */
@@ -336,6 +401,94 @@
             "</div>";
         })
         .catch(function (e) { fail(e, "載入詢價紀錄"); });
+    },
+
+    users: function () {
+      title.textContent = "使用者";
+      desc.textContent = "誰可以編輯與發布官網內容";
+      actions.innerHTML = '<button class="btn btn--primary btn--sm" id="addUser">新增使用者</button>';
+      busy("讀取使用者清單…");
+
+      $("#addUser").onclick = function () { renderUserForm(); };
+
+      SB.fn.users("list").then(function (r) {
+        var rows = r.editors || [];
+        body.innerHTML =
+          '<div class="panel"><div class="panel__head"><div><h3>官網編輯者</h3><p>共 ' + rows.length +
+          " 人。只有列在這裡的帳號能寫入官網資料</p></div>" +
+          '<span class="saved" id="uSaved">已儲存</span></div>' +
+          "<table><thead><tr><th>帳號</th><th>權限</th><th>最後登入</th><th></th></tr></thead><tbody>" +
+          rows.map(function (u) {
+            var me = (SB.auth.current() || {}).user || {};
+            var isMe = u.user_id === me.id;
+            return "<tr><td><b>" + esc(u.email || u.user_id) + "</b>" +
+              (isMe ? ' <span class="pill">你</span>' : "") +
+              (u.confirmed ? "" : ' <span class="pill is-draft">未驗證</span>') +
+              '<span class="sub">' + esc(u.user_id) + "</span></td>" +
+              '<td><select data-role="' + esc(u.user_id) + '"' + (isMe ? " disabled" : "") + ">" +
+              ROLE_OPTS.map(function (o) {
+                return '<option value="' + o[0] + '"' + (u.role === o[0] ? " selected" : "") +
+                       ">" + o[1] + "</option>";
+              }).join("") + "</select></td>" +
+              "<td>" + esc(u.last_sign_in_at ? u.last_sign_in_at.slice(0, 10) : "從未登入") + "</td>" +
+              '<td style="text-align:right">' +
+              '<button class="btn btn--sm" data-pw="' + esc(u.user_id) + '">重設密碼</button> ' +
+              (isMe ? "" : '<button class="btn btn--sm" data-revoke="' + esc(u.user_id) +
+                           '" data-email="' + esc(u.email || "") + '">收回權限</button>') +
+              "</td></tr>";
+          }).join("") + "</tbody></table></div>" +
+          '<div id="userForm"></div>' +
+          '<div class="panel"><div class="panel__head"><div><h3>關於權限</h3>' +
+          "<p>本 Supabase 專案由報價系統、KMS 與官網共用</p></div></div>" +
+          '<div class="panel__body">' +
+          '<div class="note"><b>「收回權限」不會刪除帳號。</b>只會把人移出官網編輯名單。' +
+          "該帳號的 UUID 可能被 KMS 或 CPF 參照，刪掉會在別的系統造成孤兒資料。</div>" +
+          '<div class="note"><b>密碼由管理者轉達。</b>本專案沒有設定寄信服務，' +
+          "所以重設密碼不會寄信，而是在畫面上顯示一次臨時密碼，請你自行轉達並要求對方登入後更改。</div>" +
+          "</div></div>";
+
+        body.onclick = function (e) {
+          var pw = e.target.closest("[data-pw]");
+          var rv = e.target.closest("[data-revoke]");
+          if (pw) {
+            if (!confirm("重設這個帳號的密碼？舊密碼會立即失效。")) return;
+            pw.disabled = true; pw.textContent = "處理中…";
+            SB.fn.users("set_password", { user_id: pw.dataset.pw })
+              .then(function (r2) { showTempPassword(null, r2.temp_password); })
+              .catch(function (err) { alert("重設失敗：" + (err.message || "")); })
+              .then(function () { views.users(); });
+          }
+          if (rv) {
+            if (!confirm("收回 " + (rv.dataset.email || "這個帳號") +
+                         " 的官網編輯權限？\n\n帳號本身不會被刪除，其他系統不受影響。")) return;
+            SB.fn.users("revoke", { user_id: rv.dataset.revoke })
+              .then(views.users)
+              .catch(function (err) { alert("收回失敗：" + (err.message || "")); });
+          }
+        };
+
+        body.addEventListener("change", function (e) {
+          var sel = e.target.closest("[data-role]");
+          if (!sel) return;
+          SB.db.update("web_editors", { user_id: "eq." + sel.dataset.role }, { role: sel.value })
+            .then(function () { flash($("#uSaved"), "已儲存"); })
+            .catch(function (err) { flash($("#uSaved"), "儲存失敗：" + (err.message || "")); });
+        });
+      }).catch(function (e) {
+        // function 未部署時 CORS preflight 就失敗了，拿不到 status，只會是 Failed to fetch
+        var notDeployed = e.status === 404 || !e.status;
+        if (notDeployed) {
+          body.innerHTML = '<div class="panel"><div class="panel__body">' +
+            '<div class="note"><b>admin-users function 尚未部署。</b>使用者管理需要 service_role 權限，' +
+            "那把 key 不能放前端，所以必須經過 Edge Function。<br><br>" +
+            "部署指令：<code>supabase functions deploy admin-users --project-ref tcvlnpgpuphdalzvmoyo</code></div>" +
+            "</div></div>";
+        } else if (e.status === 403) {
+          body.innerHTML = '<div class="panel"><div class="panel__body">' +
+            '<div class="note"><b>只有官網 admin 能管理使用者。</b>你目前的權限是 editor 或更低。</div>' +
+            "</div></div>";
+        } else { fail(e, "載入使用者清單"); }
+      });
     },
 
     settings: function () {

@@ -193,6 +193,16 @@
   /* ---------- Edge Functions ---------- */
 
   var fn = {
+    /** 使用者管理：需要 service_role，一律經 Edge Function */
+    users: function (action, payload) {
+      return auth.ensure().then(function () {
+        return request("/functions/v1/admin-users", {
+          method: "POST",
+          body: Object.assign({ action: action }, payload || {}),
+        });
+      });
+    },
+
     translate: function (text, from, to, context) {
       return auth.ensure().then(function () {
         return request("/functions/v1/translate", {
