@@ -419,8 +419,12 @@ section[id] { scroll-margin-top: calc(var(--header-h) + 8px); }
 /* ---------- Closing CTA ---------- */
 .cta { position: relative; background: var(--ink); color: #fff; overflow: hidden; }
 .cta__media { position: absolute; inset: 0; }
-.cta__media img { width: 100%; height: 100%; object-fit: cover; opacity: .34; }
-.cta__media::after { content: ""; position: absolute; inset: 0; background: linear-gradient(105deg, rgba(10,11,13,.95) 22%, rgba(10,11,13,.55) 100%); }
+.cta__media img { width: 100%; height: 100%; object-fit: cover; opacity: .62; }
+.cta__media::after {
+  content: ""; position: absolute; inset: 0;
+  background: linear-gradient(105deg, rgba(10,11,13,.92) 0%, rgba(10,11,13,.74) 32%,
+                              rgba(10,11,13,.3) 74%, rgba(10,11,13,.2) 100%);
+}
 .cta .wrap { position: relative; z-index: 1; }
 .cta h2 { font-size: clamp(2rem, 4.6vw, 3.7rem); font-stretch: 112%; max-width: 20ch; }
 .cta p { margin-top: 24px; font-size: clamp(1rem, 1.35vw, 1.16rem); color: rgba(255,255,255,.72); max-width: 56ch; }
@@ -539,10 +543,12 @@ section[id] { scroll-margin-top: calc(var(--header-h) + 8px); }
   padding: calc(var(--header-h) + clamp(56px, 8vw, 104px)) 0 clamp(52px, 7vw, 92px);
 }
 .page-hero__media { position: absolute; inset: 0; }
-.page-hero__media img { width: 100%; height: 100%; object-fit: cover; opacity: .42; }
+.page-hero__media img { width: 100%; height: 100%; object-fit: cover; opacity: .72; }
 .page-hero__media::after {
   content: ""; position: absolute; inset: 0;
-  background: linear-gradient(100deg, rgba(8,9,11,.95) 26%, rgba(8,9,11,.6) 100%);
+  /* 左側維持足夠暗度讓白字可讀，右側大幅放亮讓照片看得出來 */
+  background: linear-gradient(100deg, rgba(8,9,11,.92) 0%, rgba(8,9,11,.78) 34%,
+                              rgba(8,9,11,.34) 72%, rgba(8,9,11,.22) 100%);
 }
 .page-hero .wrap { position: relative; z-index: 1; }
 .crumbs { display: flex; flex-wrap: wrap; gap: 10px; font-size: 12px; letter-spacing: .12em; text-transform: uppercase; color: rgba(255,255,255,.5); }
@@ -852,3 +858,41 @@ section[id] { scroll-margin-top: calc(var(--header-h) + 8px); }
   .pfilter__select { flex: 1 1 100%; }
   .pfilter__count { margin-left: 0; }
 }
+
+/* ---------- 認證 Logo 牆 ---------- */
+.certgroup {
+  font-size: 11.5px; font-weight: 600; letter-spacing: .2em; text-transform: uppercase;
+  color: var(--red); font-family: var(--body);
+  margin-top: 44px; padding-bottom: 14px; border-bottom: 1px solid var(--line);
+}
+.certgroup:first-child { margin-top: 0; }
+.certgrid {
+  /* 用每格自己的邊框而不是 gap+底色：整列沒填滿時才不會露出灰色空格 */
+  display: grid; grid-template-columns: repeat(4, 1fr);
+  border-left: 1px solid var(--line);
+}
+.certcard {
+  background: var(--paper); padding: 26px 22px 28px;
+  border-right: 1px solid var(--line); border-bottom: 1px solid var(--line);
+  display: flex; flex-direction: column; align-items: flex-start;
+}
+.certcard__logo {
+  width: 100%; height: 62px; margin-bottom: 20px;
+  display: flex; align-items: center; justify-content: flex-start;
+}
+.certcard__logo img { max-height: 62px; max-width: 100%; width: auto; object-fit: contain; }
+/* 圖檔尚未提供時的替代版位：不留空白，也不假裝有 logo */
+.certcard__logo.is-missing::before {
+  content: "LOGO";
+  display: flex; align-items: center; justify-content: center;
+  width: 96px; height: 56px;
+  font-size: 10px; font-weight: 600; letter-spacing: .18em; color: var(--silver);
+  border: 1px dashed var(--line);
+  background: repeating-linear-gradient(135deg, transparent 0 8px, rgba(0,0,0,.02) 8px 16px);
+}
+.certcard__name { font-family: var(--display); font-size: 1.02rem; font-weight: 700; font-stretch: 106%; }
+.certcard__scope { margin-top: 9px; font-size: 13.5px; line-height: 1.5; color: var(--text-muted); }
+
+@media (max-width: 1100px) { .certgrid { grid-template-columns: repeat(3, 1fr); } }
+@media (max-width: 760px)  { .certgrid { grid-template-columns: repeat(2, 1fr); } }
+@media (max-width: 460px)  { .certgrid { grid-template-columns: 1fr; } }
