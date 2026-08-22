@@ -9,7 +9,6 @@
       "title": "COMART — From Product Concept to Mass Production | ODM / OEM Partner",
       "desc": "COMART is an ODM/OEM partner for consumer electronics and automotive accessory brands. One team covers product planning, design, mechanical and electronics engineering, tooling, plastic injection, assembly, testing and supply chain delivery across Taiwan, China and Vietnam."
     },
-
     {
       "out": "services/index.html",
       "src": "services.html",
@@ -59,7 +58,6 @@
       "title": "Supply Chain & Delivery | COMART Services",
       "desc": "Material and sub-supplier management, production allocation between China and Vietnam, pilot run to mass production transfer, packaging and shipment coordination, delivery and quality project management."
     },
-
     {
       "out": "global-operations/index.html",
       "src": "global-operations.html",
@@ -92,8 +90,15 @@
       "out": "company/index.html",
       "src": "company.html",
       "nav": "company",
-      "title": "Company — About COMART, Milestones and News | COMART",
+      "title": "Company — About COMART, Vision and Milestones | COMART",
       "desc": "COMART has been developing and manufacturing consumer electronics and automotive accessories since 1994, with over 200 employees and more than 100 patents granted to date."
+    },
+    {
+      "out": "news/index.html",
+      "src": "news.html",
+      "nav": "news",
+      "title": "News — Exhibitions, Capability and Certification Updates | COMART",
+      "desc": "COMART company news: exhibitions and trade shows, company development, certification updates, new equipment and capacity, and new product releases."
     },
     {
       "out": "start-your-project/index.html",
@@ -101,6 +106,13 @@
       "nav": null,
       "title": "Start Your Project | COMART",
       "desc": "Tell us where your product stands today. Send us your product stage, application, target market and volume expectation, and we will come back with a development route and the right people from our team."
+    },
+    {
+      "out": "inquiry/index.html",
+      "src": "inquiry.html",
+      "nav": null,
+      "title": "Inquiry | COMART",
+      "desc": "Start a project with COMART, or email our sales team directly. Choose whichever suits how far your product has progressed."
     }
   ]
 }

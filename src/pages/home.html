@@ -448,11 +448,11 @@
   </div>
 </section>
 
-<!-- ============ COMPANY NEWS ============ -->
-<section class="section" id="company">
+<!-- ============ NEWS ============ -->
+<section class="section" id="news">
   <div class="wrap">
     <div class="section-head reveal">
-      <span class="eyebrow">09 — Company News</span>
+      <span class="eyebrow">09 — News</span>
       <h2>What is happening at COMART.</h2>
       <p class="lead">
         Exhibitions, company development, certification updates, new equipment and capacity, and new
@@ -460,30 +460,9 @@
       </p>
     </div>
 
-    <div class="news-grid">
-      <article class="news reveal">
-        <div class="meta"><span class="cat">Exhibition</span><span>[ Date ]</span></div>
-        <h3>[ News headline — to be supplied ]</h3>
-        <p>Placeholder card. Live content will be maintained in the back office once the news module is connected.</p>
-        <a class="tlink" href="#">Read More <span>→</span></a>
-      </article>
-      <article class="news reveal">
-        <div class="meta"><span class="cat">Capability</span><span>[ Date ]</span></div>
-        <h3>[ News headline — to be supplied ]</h3>
-        <p>Placeholder card. Live content will be maintained in the back office once the news module is connected.</p>
-        <a class="tlink" href="#">Read More <span>→</span></a>
-      </article>
-      <article class="news reveal">
-        <div class="meta"><span class="cat">Certification</span><span>[ Date ]</span></div>
-        <h3>[ News headline — to be supplied ]</h3>
-        <p>Placeholder card. Live content will be maintained in the back office once the news module is connected.</p>
-        <a class="tlink" href="#">Read More <span>→</span></a>
-      </article>
+    <div class="news-grid" id="newsGrid" data-limit="3" data-root="{{ROOT}}" aria-live="polite">
+      <p class="prod-state">Loading news…</p>
     </div>
-
-    <p class="placeholder-flag reveal">
-      設計稿說明：本區為 Company News 版位示意，尚未填入真實新聞內容，待內容確認後替換。
-    </p>
   </div>
 </section>
 
@@ -503,7 +482,7 @@
       </p>
       <div class="cta__actions">
         <a class="btn" href="{{ROOT}}start-your-project/">Start Your Project <span class="arrow">→</span></a>
-        <a class="btn btn--ghost" href="mailto:sales@comart.com.tw">Contact Sales <span class="arrow">→</span></a>
+        <a class="btn btn--ghost" href="{{ROOT}}inquiry/">Other Ways to Reach Us <span class="arrow">→</span></a>
       </div>
       <p class="cta__note">
         MOQ and lead time are evaluated based on the product, material, tooling complexity and order
@@ -512,3 +491,6 @@
     </div>
   </div>
 </section>
+
+<script src="{{ROOT}}assets/js/config.js"></script>
+<script src="{{ROOT}}assets/js/news.js" defer></script>

@@ -30,6 +30,8 @@
     { id: "quality",    path: "/quality-compliance/", name: "Quality & Compliance", fields: ["title", "lead"] },
     { id: "equipment",  path: "/equipment/",          name: "Equipment",            fields: ["title", "lead"] },
     { id: "company",    path: "/company/",            name: "Company",              fields: ["title", "lead"] },
+    { id: "news",       path: "/news/",               name: "News",                 fields: ["title", "lead"] },
+    { id: "inquiry",    path: "/inquiry/",            name: "Inquiry",              fields: ["title", "lead"] },
     { id: "start",      path: "/start-your-project/", name: "Start Your Project",   fields: ["title", "lead"] }
   ];
   var FIELD_LABEL = {
