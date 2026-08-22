@@ -1,0 +1,20 @@
+# GitHub Pages 會用 Jekyll 處理這個 repo。
+#
+# ★ 這個檔案是承重結構，不是設定小事。
+#   exclude 是原始碼、資料庫 schema、產生器與內部文件「不會被公開服務」的唯一原因。
+#   刪掉或搬到不跑 Jekyll 的平台（Cloudflare Pages、Netlify、Vercel 的純靜態模式），
+#   整個 repo 會直接被端上網路，而且是靜默的——不會有錯誤訊息，
+#   要等到有人去抓那個網址才會發現。
+#   （此陷阱由 VIEMAG 專案 planning/網域與雲端架構操作手冊.md 記錄，2026-07-31）
+
+exclude:
+  - src/            # 頁面樣板與內容原始檔
+  - docs/           # 資料架構說明與 SQL schema
+  - build.py        # 靜態產生器
+  - README.md
+  - .gitignore
+  - _test.html
+
+# 不使用 Jekyll 的任何佈景或外掛，只借用它的 exclude 行為
+theme: null
+plugins: []
