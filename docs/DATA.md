@@ -5,7 +5,7 @@
 | 資料 | 來源 | 誰維護 |
 |---|---|---|
 | 產品 | 報價系統的 `products` 資料表 | 報價系統既有流程 |
-| 頁面文案、公司動態、詢價案件 | 官網自己的 `web_*` 資料表 | 官網後台 `www/admin` |
+| 頁面文案、公司動態、詢價案件 | 官網自己的 `web_*` 資料表 | 官網後台 `www/webadmin` |
 
 兩者都在同一個 Supabase 專案：`tcvlnpgpuphdalzvmoyo`。
 
@@ -76,7 +76,7 @@ Edge Function，才能做驗證、防濫用與 Email 通知。
 | 繁體中文、越南文 | 未開始 |
 | `web_*` 資料表與 view | **SQL 已寫好，尚未在 Supabase 執行** |
 | 前台產品清單 | 讀 `assets/data/products.sample.json` 範例資料 |
-| 後台 `www/admin` | 離線示範模式，資料存在瀏覽器 localStorage |
+| 後台 `www/webadmin` | 離線示範模式，資料存在瀏覽器 localStorage |
 | 後台登入 | 未接 Supabase Auth，任何帳密都能進入 |
 | 詢價表單送出 | 未接後端，送出鍵不會傳送資料 |
 | 自動翻譯 | 未建置 |
@@ -88,7 +88,7 @@ Edge Function，才能做驗證、防濫用與 Email 通知。
 1. 在 Supabase SQL Editor 執行 `docs/sql/web_schema.sql`
 2. 建立後台使用者，並決定角色（管理者／內容編輯／產品編輯／發布者）
 3. 前台：`assets/js/products.js` 的 `SOURCE` 改成 `'supabase'`，填入 `SUPABASE.url` 與 `anonKey`
-4. 後台：`admin/admin.js` 的 `MODE` 改成 `'supabase'`，填入 `CONFIG`
+4. 後台：`webadmin/admin.js` 的 `MODE` 改成 `'supabase'`，填入 `CONFIG`
 5. 建立 Edge Function 處理詢價表單寫入、Email 通知與自動翻譯
 
 **絕對不要**把 `service_role` key 放進這個 repo 的任何檔案。
@@ -98,7 +98,7 @@ repo 與 GitHub Pages 都是公開的，只能使用受 RLS 保護的 publishabl
 
 ## 五、後台的可及性
 
-`www/admin` 部署在公開的 GitHub Pages 上，任何人都能開啟該網址。
+`www/webadmin` 部署在公開的 GitHub Pages 上，任何人都能開啟該網址。
 這是靜態前端的必然結果——真正的保護在 Supabase 的 Auth 與 RLS，不在於網址是否隱密。
 
 接上正式資料庫時必須確認：

@@ -236,7 +236,7 @@
         '<div class="panel__body">' +
         '<div class="note">1. 在 Supabase 執行 <code>docs/sql/web_schema.sql</code>，建立 web_* 資料表與公開 view。</div>' +
         '<div class="note">2. 建立後台使用者，並指定管理者／內容編輯／產品編輯／發布者角色。</div>' +
-        '<div class="note">3. 把專案 URL 與 publishable key 填入 <code>admin/admin.js</code> 的 CONFIG，' +
+        '<div class="note">3. 把專案 URL 與 publishable key 填入 <code>webadmin/admin.js</code> 的 CONFIG，' +
         "並把 MODE 改成 <code>supabase</code>；前台則改 <code>assets/js/products.js</code> 的 SOURCE。</div>" +
         '<div class="note"><b>不要</b>把 service_role key 放進任何前端檔案，這個 repo 是公開的。</div>' +
         "</div></div>";

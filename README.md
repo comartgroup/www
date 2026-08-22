@@ -15,7 +15,7 @@ src/
   pages/                 各頁內容
   content/pages.en.json  頁面清冊：路徑、標題、SEO 描述
 assets/                  CSS、JS、圖片、範例資料
-admin/                   官網後台（內容管理）
+webadmin/                官網後台（內容管理）
 docs/DATA.md             資料架構與串接說明
 docs/sql/web_schema.sql  Supabase 資料表與公開 view
 index.html 等            build.py 產生的結果，直接由 GitHub Pages 服務
@@ -46,7 +46,7 @@ python3 -m http.server 8899
 | 英文版 14 頁 | 已完成 |
 | 繁體中文、越南文 | 未開始（`build.py` 的 `LANGS` 已預留） |
 | 產品清單 | 讀範例資料，未接報價系統 |
-| 後台 `admin/` | 離線示範模式，資料存 localStorage |
+| 後台 `webadmin/` | 離線示範模式，資料存 localStorage |
 | 詢價表單 | 未接後端 |
 | Equipment 詳細設備 | 待由 `Comart Corp. introduction 20251020` 匯入 |
 | Company News | 版位示意，待真實內容 |

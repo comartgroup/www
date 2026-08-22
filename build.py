@@ -102,7 +102,7 @@ def main():
 
     write(os.path.join(BASE, 'sitemap.xml'), build_sitemap(pages))
     write(os.path.join(BASE, 'robots.txt'),
-          'User-agent: *\nAllow: /\nDisallow: /admin/\nSitemap: %ssitemap.xml\n' % SITE_URL)
+          'User-agent: *\nAllow: /\nDisallow: /webadmin/\nSitemap: %ssitemap.xml\n' % SITE_URL)
     print('\n%d 頁產生完成，另含 sitemap.xml 與 robots.txt' % len(pages))
 
 
