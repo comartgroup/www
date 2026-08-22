@@ -9,6 +9,13 @@
 --      products 只有 catId / catId2，是代碼不是名稱，前端無法直接顯示。
 --
 -- 產品主檔仍在報價系統的 public.products，本檔不修改該表。
+--
+-- ★ 為什麼是 DROP + CREATE 而不是 CREATE OR REPLACE：
+--   PostgreSQL 的 CREATE OR REPLACE VIEW 只能在既有欄位「尾端追加」，
+--   不能改變欄位名稱或順序。本次要在中段插入分類欄位，用 REPLACE 會報
+--   「cannot change name of view column "material" to "cat_code"」。
+--   兩個 view 都沒有其他資料庫物件依賴，直接 drop 重建是安全的；
+--   前台在重建的瞬間查詢會失敗，但只有不到一秒，且尚無產品上架。
 -- =========================================================
 
 -- ---------------------------------------------------------
@@ -16,7 +23,9 @@
 --   ★ 安全關鍵不變：不得出現 supplier1/2、cost1/2、curr1/2、costRef、
 --     defaultPrice、bom、bomFiles。
 -- ---------------------------------------------------------
-create or replace view public.web_products_public as
+drop view if exists public.web_products_public;
+
+create view public.web_products_public as
 select
   p.id,
   p.series,
@@ -60,7 +69,9 @@ grant select on public.web_products_public to anon, authenticated;
 -- 後台用 view：仍列出全部產品（含非 Normal），讓編輯者知道全貌，
 -- 但要看得出哪些即使勾了上架也不會出現在前台。
 -- ---------------------------------------------------------
-create or replace view public.web_products_admin
+drop view if exists public.web_products_admin;
+
+create view public.web_products_admin
 with (security_invoker = off) as
 select
   p.id,
