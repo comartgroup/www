@@ -710,3 +710,12 @@ section[id] { scroll-margin-top: calc(var(--header-h) + 8px); }
   .ms { grid-template-columns: 1fr; gap: 10px; }
   .ms__year { font-size: 1.35rem; }
 }
+
+/* ---------- 表單送出狀態 ---------- */
+.placeholder-flag.is-ok {
+  background: rgba(30,122,70,.07); border-left-color: #1E7A46; color: #14562F;
+}
+.placeholder-flag.is-error {
+  background: rgba(171,37,46,.08); border-left-color: var(--red); color: var(--red-deep);
+}
+.placeholder-flag a { text-decoration: underline; }

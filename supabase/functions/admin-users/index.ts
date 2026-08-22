@@ -32,7 +32,9 @@ function cors(origin: string | null) {
   const allow = origin && ALLOWED_ORIGINS.includes(origin) ? origin : ALLOWED_ORIGINS[0];
   return {
     "Access-Control-Allow-Origin": allow,
-    "Access-Control-Allow-Headers": "content-type, authorization",
+    // 瀏覽器 preflight 會宣告 apikey 與 authorization，少列任何一個都會讓
+    // 整個請求在 preflight 階段就失敗——curl 不做 preflight，測不出來
+    "Access-Control-Allow-Headers": "authorization, apikey, content-type, x-client-info",
     "Access-Control-Allow-Methods": "POST, OPTIONS",
   };
 }

@@ -80,9 +80,10 @@ Edge Function，才能做驗證、防濫用與 Email 通知。
 | 前台產品清單 | 已接 `web_products_public`；目前 0 筆，因為尚未有產品上架 |
 | 後台 `www/webadmin` | 已接 Supabase Auth 與資料表，無本機備份 |
 | 後台登入 | Supabase Auth 密碼登入，**尚未建立任何使用者帳號** |
-| 詢價表單送出 | Edge Function 程式碼完成，**尚未部署**，前台尚未接上送出邏輯 |
-| 自動翻譯 | Edge Function 程式碼完成，**尚未部署** |
-| 使用者管理 | 後台介面完成；`admin-users` Edge Function **尚未部署** |
+| 詢價表單送出 | 已部署並實測通過（瀏覽器端到端） |
+| 自動翻譯 | 已部署，需登入且在 web_editors 名單內才能呼叫 |
+| 使用者管理 | 已部署 |
+| 詢價通知信 | 未啟用，缺 `RESEND_API_KEY`；資料仍會寫入 |
 
 ---
 

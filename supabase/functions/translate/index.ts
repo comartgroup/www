@@ -74,7 +74,9 @@ function cors(origin: string | null) {
   const allow = origin && ALLOWED_ORIGINS.includes(origin) ? origin : ALLOWED_ORIGINS[0];
   return {
     "Access-Control-Allow-Origin": allow,
-    "Access-Control-Allow-Headers": "content-type, authorization",
+    // 瀏覽器 preflight 會宣告 apikey 與 authorization，少列任何一個都會讓
+    // 整個請求在 preflight 階段就失敗——curl 不做 preflight，測不出來
+    "Access-Control-Allow-Headers": "authorization, apikey, content-type, x-client-info",
     "Access-Control-Allow-Methods": "POST, OPTIONS",
   };
 }
@@ -86,15 +88,41 @@ function json(body: unknown, status: number, origin: string | null) {
   });
 }
 
+const SUPA_URL = Deno.env.get("SUPABASE_URL")!;
+const SUPA_SVC = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!;
+
+/** 確認呼叫者是 web_editors 白名單內的使用者。回傳 true 或錯誤字串。 */
+async function requireEditor(auth: string): Promise<true | string> {
+  const me = await fetch(`${SUPA_URL}/auth/v1/user`, {
+    headers: { apikey: SUPA_SVC, authorization: auth },
+  });
+  if (!me.ok) return "Invalid session";
+  const user = await me.json();
+  if (!user?.id) return "Invalid session";
+
+  const row = await fetch(
+    `${SUPA_URL}/rest/v1/web_editors?select=user_id&user_id=eq.${user.id}&limit=1`,
+    { headers: { apikey: SUPA_SVC, authorization: `Bearer ${SUPA_SVC}` } },
+  );
+  const rows = row.ok ? await row.json() : [];
+  return rows.length ? true : "Not a website editor";
+}
+
 Deno.serve(async (req) => {
   const origin = req.headers.get("origin");
 
   if (req.method === "OPTIONS") return new Response(null, { status: 204, headers: cors(origin) });
   if (req.method !== "POST") return json({ error: "Method not allowed" }, 405, origin);
 
-  // 只有登入的後台使用者可以呼叫，避免這支函式變成公開的翻譯 API
+  // 只有官網編輯者可以呼叫。
+  // ★ 光檢查 Authorization header 存在是不夠的：公開的 publishable key 本身
+  //   就是一個合法 bearer，任何人都拿得到。必須真的向 Supabase 確認身分，
+  //   否則這支函式等於一個公開的 LLM 端點，會被拿去燒 API 額度。
   const auth = req.headers.get("authorization");
   if (!auth) return json({ error: "Authentication required" }, 401, origin);
+
+  const gate = await requireEditor(auth);
+  if (gate !== true) return json({ error: gate }, gate === "Invalid session" ? 401 : 403, origin);
 
   let body: { text?: string; from?: string; to?: string[]; context?: string };
   try {
