@@ -170,7 +170,7 @@ revoke select on public.web_enquiries from anon;
 -- =========================================================
 -- 尚未包含、需要另外決定的項目：
 --   * 後台角色細分（管理者／內容編輯／產品編輯／發布者）— 規劃書 8.3
---   * 自動翻譯 Edge Function 與翻譯服務帳號 — 規劃書 8.2、17.1
---   * 詢價通知的收件 Email 與案件狀態流程 — 規劃書 17.1
+--   * 自動翻譯 Edge Function：使用 Claude API（Sonnet），key 只放 Edge Function
+--   * 詢價通知收件 Email：sales@comart.com.tw（2026-08-22 確認）；案件狀態流程待定
 --   * 圖片與型錄的 Storage bucket 與存取政策
 -- =========================================================

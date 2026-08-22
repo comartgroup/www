@@ -654,3 +654,34 @@ section[id] { scroll-margin-top: calc(var(--header-h) + 8px); }
 @media (max-width: 1180px) { .prod-catalogue { grid-template-columns: repeat(3, 1fr); } }
 @media (max-width: 860px)  { .prod-catalogue { grid-template-columns: repeat(2, 1fr); } }
 @media (max-width: 560px)  { .prod-catalogue { grid-template-columns: 1fr; } }
+
+/* ---------- 設備清單 ---------- */
+.eqnav { margin-top: 44px; display: flex; flex-wrap: wrap; gap: 10px; }
+.eqnav a {
+  font-size: 12px; font-weight: 600; letter-spacing: .14em; text-transform: uppercase;
+  color: var(--text-muted); border: 1px solid var(--line); padding: 11px 18px; background: #fff;
+  transition: color .2s ease, border-color .2s ease;
+}
+.eqnav a:hover { color: var(--red); border-color: var(--red); }
+
+.eqgroup { margin-top: 44px; background: #fff; border: 1px solid var(--line); scroll-margin-top: calc(var(--header-h) + 20px); }
+.eqgroup__head { padding: 22px 26px; border-bottom: 1px solid var(--line); display: flex; align-items: baseline; justify-content: space-between; gap: 18px; }
+.eqgroup__head h3 { font-size: 1.14rem; font-stretch: 106%; }
+.eqgroup__count { font-size: 11.5px; font-weight: 600; letter-spacing: .16em; text-transform: uppercase; color: var(--red); }
+
+.eqtable { width: 100%; border-collapse: collapse; font-size: 14.5px; }
+.eqtable th {
+  text-align: left; padding: 13px 26px; background: var(--paper-2); border-bottom: 1px solid var(--line);
+  font-size: 11px; font-weight: 600; letter-spacing: .16em; text-transform: uppercase; color: var(--text-muted);
+}
+.eqtable td { padding: 13px 26px; border-bottom: 1px solid var(--line); vertical-align: top; }
+.eqtable tr:last-child td { border-bottom: 0; }
+.eqtable tbody tr:hover { background: var(--paper-2); }
+.eqtable .mdl { color: var(--text-muted); font-size: 13.5px; }
+.eqtable .qty { width: 80px; text-align: right; font-variant-numeric: tabular-nums; font-weight: 600; }
+.eqtable th:last-child { text-align: right; }
+
+@media (max-width: 700px) {
+  .eqtable th, .eqtable td { padding: 11px 16px; }
+  .eqtable .mdl { font-size: 12.5px; }
+}

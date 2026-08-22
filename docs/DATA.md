@@ -106,3 +106,36 @@ repo 與 GitHub Pages 都是公開的，只能使用受 RLS 保護的 publishabl
 - 所有 `web_*` 資料表都啟用 RLS，且匿名角色沒有多餘權限
 - 後台帳號使用強密碼，並考慮開啟 MFA
 - `web_enquiries` 的客戶個資只有登入者可讀
+
+---
+
+## 六、已確認的營運決定（2026-08-22）
+
+| 項目 | 決定 |
+|---|---|
+| 詢價通知收件人 | `sales@comart.com.tw` |
+| 自動翻譯服務 | Claude API（Sonnet），不使用 DeepL |
+| 翻譯成本上限 | Anthropic Console 的 workspace spend limit，建議 US$20/月 |
+| 翻譯 key 放置位置 | **只能在 Supabase Edge Function**，絕不進前端 |
+| 設備資料來源 | `Catalog/Comart Corp. introduction 20251020`，資料版本 2025-10-20 |
+| 設備排除範圍 | 第 30 頁 CNC 金屬加工設備清單 |
+
+### 為什麼選 Claude 而不是 DeepL
+
+全站文案約 3–6 萬字元，翻兩語的一次性成本兩邊都在個位數美金，成本不是決勝點。
+差別在於 Claude 能遵守規則而 DeepL 的 glossary 只能做名詞替換：
+
+- `Innovative ODM reliable partner` 原樣輸出，不翻譯
+- 法人名稱固定用既定寫法（COMART CORPORATION／怡業股份有限公司／東莞恒群塑膠有限公司／COMART VIETNAM CO., LTD.）
+- 不得生成規劃書禁止的數字（固定 MOQ、交期、模具天數）
+- DFM、two-shot、over-moulding、T1 等術語三語對照固定
+- 越南文採商業文書語氣
+
+### GitHub Pages 的 Jekyll exclude 是承重結構
+
+`_config.yml` 的 `exclude:` 是 `src/`、`docs/`、`build.py` 不被公開服務的**唯一原因**。
+移除它、或搬到不跑 Jekyll 的平台（Cloudflare Pages、Netlify、Vercel 純靜態模式），
+整個 repo 會被端上網路，而且是**靜默失效**——沒有錯誤訊息。
+
+此結論來自 VIEMAG 專案 `planning/網域與雲端架構操作手冊.md`（2026-07-31）。
+2026-08-22 實測確認 COMART 站曾有相同外洩，已修補。
