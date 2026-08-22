@@ -17,19 +17,24 @@
  *   supabase functions deploy enquiry --project-ref tcvlnpgpuphdalzvmoyo
  */
 
-const NOTIFY_TO = "sales@comart.com.tw";
-
 /**
- * 寄件位址由 secret 決定，因為它必須跟 Resend 驗證過的網域一致。
+ * 通知信的收發位址。兩者都可由 secret 覆寫，因為它們跟 Resend 的網域驗證狀態綁在一起。
  *
- * ★ comart.com.tw 的 SPF 是 `v=spf1 include:spf.protection.outlook.com -all`
- *   （硬性拒絕，只允許 Microsoft 365），DMARC 是 p=quarantine。
- *   從主網域寄出會 SPF 失敗並被隔離。因此應在 Resend 驗證一個子網域
- *   （例如 send.comart.com.tw）並用它當寄件位址，主網域的 SPF 與 DMARC
- *   完全不必更動——那是公司正式信箱在用的，改錯會讓全公司收不到信。
+ * 目前採「零 DNS」模式（2026-08-22 Woody 決定）：
+ *   Resend 未驗證網域時只能從 onboarding@resend.dev 寄出，且只能寄到
+ *   註冊該 Resend 帳號的那個信箱，因此收件人設為 woody@comart.com.tw。
+ *   這封信是內部通知，客戶看不到寄件人，reply_to 已指向客戶本人，
+ *   所以醜一點的寄件位址沒有影響。
+ *
+ * 之後若要改成正式的 noreply@send.comart.com.tw 寄給 sales@comart.com.tw：
+ *   1. 在 Resend 驗證子網域 send.comart.com.tw（不要動主網域的 SPF，
+ *      那是 -all 且 M365 正在用，改錯全公司信箱會壞）
+ *   2. supabase secrets set NOTIFY_FROM="COMART Website <noreply@send.comart.com.tw>" \
+ *                           NOTIFY_TO="sales@comart.com.tw"
+ *   程式不需要改。
  */
-const NOTIFY_FROM = Deno.env.get("NOTIFY_FROM") ??
-                    "COMART Website <noreply@send.comart.com.tw>";
+const NOTIFY_TO   = Deno.env.get("NOTIFY_TO")   ?? "woody@comart.com.tw";
+const NOTIFY_FROM = Deno.env.get("NOTIFY_FROM") ?? "COMART Website <onboarding@resend.dev>";
 
 const ALLOWED_ORIGINS = [
   "https://comartgroup.github.io",
@@ -98,10 +103,7 @@ async function notify(row: Record<string, string>) {
     console.log("[enquiry] RESEND_API_KEY 未設定，略過通知信，資料已寫入");
     return { sent: false, reason: "no_key" };
   }
-  if (!Deno.env.get("NOTIFY_FROM")) {
-    console.warn("[enquiry] NOTIFY_FROM 未設定，使用預設值 " + NOTIFY_FROM +
-                 "；若該網域未在 Resend 驗證，寄送會失敗");
-  }
+  console.log("[enquiry] 通知信 " + NOTIFY_FROM + " → " + NOTIFY_TO);
 
   const lines = [
     ["Company", row.company],
@@ -134,8 +136,10 @@ async function notify(row: Record<string, string>) {
   });
 
   if (!res.ok) {
-    console.error("[enquiry] 通知信寄送失敗", res.status, await res.text());
-    return { sent: false, reason: `http_${res.status}` };
+    const detail = await res.text();
+    console.error("[enquiry] 通知信寄送失敗", res.status, detail);
+    // 資料已經寫入，寄信失敗不影響客戶那端；把原因留在 log 供排查
+    return { sent: false, reason: `http_${res.status}`, detail: detail.slice(0, 300) };
   }
   return { sent: true };
 }

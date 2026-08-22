@@ -83,7 +83,7 @@ Edge Function，才能做驗證、防濫用與 Email 通知。
 | 詢價表單送出 | 已部署並實測通過（瀏覽器端到端） |
 | 自動翻譯 | 已部署，需登入且在 web_editors 名單內才能呼叫 |
 | 使用者管理 | 已部署 |
-| 詢價通知信 | 未啟用，缺 `RESEND_API_KEY`；資料仍會寫入 |
+| 詢價通知信 | 待設 `RESEND_API_KEY`；資料無論如何都會寫入 |
 
 ---
 
@@ -142,7 +142,7 @@ repo 與 GitHub Pages 都是公開的，只能使用受 RLS 保護的 publishabl
 
 | 項目 | 決定 |
 |---|---|
-| 詢價通知收件人 | `sales@comart.com.tw` |
+| 詢價通知收件人 | `woody@comart.com.tw`（零 DNS 模式；改用驗證網域後可切回 `sales@comart.com.tw`） |
 | 自動翻譯服務 | Claude API（Sonnet），不使用 DeepL |
 | 翻譯成本上限 | Anthropic Console 的 workspace spend limit，建議 US$20/月 |
 | 翻譯 key 放置位置 | **只能在 Supabase Edge Function**，絕不進前端 |
@@ -168,3 +168,51 @@ repo 與 GitHub Pages 都是公開的，只能使用受 RLS 保護的 publishabl
 
 此結論來自 VIEMAG 專案 `planning/網域與雲端架構操作手冊.md`（2026-07-31）。
 2026-08-22 實測確認 COMART 站曾有相同外洩，已修補。
+
+---
+
+## 七、詢價通知信
+
+### 目前模式：零 DNS
+
+`comart.com.tw` 的 SPF 是 `v=spf1 include:spf.protection.outlook.com -all`（硬性拒絕，
+只允許 Microsoft 365），DMARC 是 `p=quarantine`。從主網域寄出會 SPF 失敗並被隔離。
+
+**不要為了寄通知信去改主網域的 SPF**——那是公司 M365 正式信箱在用的，
+SPF 只能有一筆，改錯會讓全公司收不到或寄不出信。
+
+因此採零 DNS 模式：
+
+| 項目 | 值 |
+|---|---|
+| 寄件 | `COMART Website <onboarding@resend.dev>`（Resend 的網域） |
+| 收件 | `woody@comart.com.tw`（必須是註冊 Resend 帳號的信箱） |
+| 回覆對象 | 自動設為客戶填寫的 email |
+
+這封信是內部通知，客戶看不到寄件人，所以寄件位址不需要好看。
+
+只需要設一個 secret：
+
+```bash
+supabase secrets set RESEND_API_KEY=... --project-ref tcvlnpgpuphdalzvmoyo
+```
+
+### 之後要升級成正式寄件位址
+
+1. 在 Resend 驗證**子網域** `send.comart.com.tw`（三筆 DNS 記錄，全部新增，不覆蓋現有）
+2. 設兩個 secret，程式不需要改：
+
+```bash
+supabase secrets set NOTIFY_FROM="COMART Website <noreply@send.comart.com.tw>" \
+                     NOTIFY_TO="sales@comart.com.tw" \
+                     --project-ref tcvlnpgpuphdalzvmoyo
+```
+
+主網域的 SPF 與 DMARC 全程不需要更動。
+`_dmarc.comart.com.tw` 沒有 `sp=`，所以 `p=quarantine` 會涵蓋子網域，
+而子網域自己的 SPF 與 DKIM 會讓 DMARC 通過。
+
+### 寄信失敗不影響收件
+
+`enquiry` 函式先寫入 `web_enquiries` 才寄信。寄信失敗只會記在 log，
+客戶端一律看到成功訊息——因為資料確實收到了。所有詢價都可從後台「詢價紀錄」查閱。
