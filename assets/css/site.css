@@ -430,8 +430,10 @@ section[id] { scroll-margin-top: calc(var(--header-h) + 8px); }
 /* ---------- Footer ---------- */
 .footer { background: #08090B; color: rgba(255,255,255,.62); padding-top: clamp(60px, 7vw, 96px); }
 .footer__top { display: grid; grid-template-columns: minmax(0, 1.15fr) repeat(3, minmax(0, 1fr)); gap: clamp(30px, 4vw, 60px); padding-bottom: 56px; }
+/* 頁尾使用 brand/COMART Logo with Slogan.ai 的官方組合稿，
+   深底反白依 CIS A-04-02「黑底反白」允許用法。不可自行拼組 Logo 與標語文字。 */
 .footer__brand img { width: 168px; }
-.footer__tag { margin-top: 22px; font-size: 14.5px; color: rgba(255,255,255,.72); letter-spacing: .02em; }
+.footer__brand .footer__lockup { width: 280px; height: auto; }
 .footer__since { margin-top: 18px; font-size: 12px; letter-spacing: .18em; text-transform: uppercase; color: rgba(255,255,255,.4); }
 .foot-site h4 { font-size: 12px; letter-spacing: .2em; text-transform: uppercase; color: #fff; font-family: var(--body); font-weight: 600; }
 .foot-site .entity { margin-top: 18px; font-size: 13.5px; color: rgba(255,255,255,.78); font-weight: 500; }
