@@ -159,7 +159,7 @@ Deno.serve(async (req) => {
       if (created.status === 422 || detail.includes("already been registered")) {
         return json({
           error: "already_exists",
-          message: "這個 email 在本 Supabase 專案已經有帳號（可能來自報價系統或 KMS）。請改用「加入既有帳號」。",
+          message: "這個 email 已經有帳號了。本專案的使用者名冊由官網、報價系統、CRM、KMS、CPF 與內部 Portal 共用，這個 email 可能是其中任一系統建立的。請改按「加入既有帳號」——那只會把他加進官網編輯名單，不會變更他原有的密碼。",
         }, 409, origin);
       }
       console.error("[admin-users] 建立帳號失敗", created.status, detail);
@@ -192,7 +192,7 @@ Deno.serve(async (req) => {
     if (!found) {
       return json({
         error: "not_found",
-        message: "本專案沒有這個 email 的帳號。請改用「建立新帳號」。",
+        message: "本專案的使用者名冊裡沒有這個 email。請改按「建立新帳號」。",
       }, 404, origin);
     }
 

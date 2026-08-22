@@ -184,13 +184,19 @@
   function renderUserForm() {
     var host = $("#userForm");
     host.innerHTML = '<div class="panel"><div class="panel__head"><div><h3>新增使用者</h3>' +
-      "<p>帳號已存在於其他系統時，請選「加入既有帳號」</p></div></div>" +
+      "<p>這個 Supabase 專案只有一份使用者名冊，官網與報價系統、CRM、KMS、CPF、" +
+      "內部 Portal 共用</p></div></div>" +
       '<div class="panel__body">' +
       '<div class="fieldrow"><label>Email</label>' +
       '<input type="email" id="nuEmail" placeholder="name@comart.com.tw"></div>' +
       '<div class="fieldrow"><label>權限</label><select id="nuRole">' +
       ROLE_OPTS.map(function (o) { return '<option value="' + o[0] + '">' + o[1] + "</option>"; }).join("") +
       "</select></div>" +
+      '<div class="note" style="margin-top:20px">' +
+      "<b>建立新帳號</b>：這個 email 從未在本專案出現過，會建一組新帳號並顯示臨時密碼。<br>" +
+      "<b>加入既有帳號</b>：這個 email 已經有帳號（例如他已經在用 KMS 或報價系統），" +
+      "只把他加進官網編輯名單，<b>不會變更他原有的密碼</b>。<br>" +
+      "不確定按哪一顆就先按「建立新帳號」，若已存在系統會提示你改用另一顆。</div>" +
       '<div class="rowactions">' +
       '<button class="btn btn--primary" id="nuCreate">建立新帳號</button>' +
       '<button class="btn" id="nuGrant">加入既有帳號</button>' +
@@ -462,7 +468,8 @@
           "<p>本 Supabase 專案由報價系統、KMS 與官網共用</p></div></div>" +
           '<div class="panel__body">' +
           '<div class="note"><b>「收回權限」不會刪除帳號。</b>只會把人移出官網編輯名單。' +
-          "該帳號的 UUID 可能被 KMS 或 CPF 參照，刪掉會在別的系統造成孤兒資料。</div>" +
+          "本專案的使用者名冊由官網、報價系統、CRM、KMS、CPF 與內部 Portal 共用，" +
+          "該帳號的 UUID 可能被其他系統參照，刪掉會在別處造成孤兒資料。</div>" +
           '<div class="note"><b>密碼由管理者轉達。</b>本專案沒有設定寄信服務，' +
           "所以重設密碼不會寄信，而是在畫面上顯示一次臨時密碼，請你自行轉達並要求對方登入後更改。</div>" +
           "</div></div>";
