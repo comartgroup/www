@@ -29,9 +29,8 @@
     <button class="btn btn--primary" type="submit">登入</button>
 
     <p class="login__note" id="loginNote">
-      <b>目前為離線示範模式。</b>資料庫與 Supabase Auth 尚未建置，
-      任何帳號密碼都會直接進入後台，所有編輯只存在這台瀏覽器的 localStorage，
-      不會寫入伺服器、也不會影響線上網站。
+      使用 Supabase Auth 登入。帳號由管理者在 Supabase Dashboard 建立，
+      沒有註冊功能。所有編輯直接寫入資料庫，權限由 RLS 政策管制。
     </p>
   </form>
 </div>
@@ -54,7 +53,7 @@
     </nav>
 
     <div class="side__foot">
-      <div class="side__mode" id="modeBadge">離線示範模式</div>
+      <div class="side__mode" id="modeBadge">已登入</div>
       <a class="side__link" href="../" target="_blank" rel="noopener">前往官網 ↗</a>
       <button class="side__link" id="logout">登出</button>
     </div>
@@ -73,6 +72,8 @@
   </main>
 </div>
 
+<script src="../assets/js/config.js"></script>
+<script src="supabase.js"></script>
 <script src="admin.js"></script>
 </body>
 </html>

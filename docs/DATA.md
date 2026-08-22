@@ -74,12 +74,13 @@ Edge Function，才能做驗證、防濫用與 Email 通知。
 |---|---|
 | 前台 14 頁（英文） | 已完成並上線 |
 | 繁體中文、越南文 | 未開始 |
-| `web_*` 資料表與 view | **SQL 已寫好，尚未在 Supabase 執行** |
-| 前台產品清單 | 讀 `assets/data/products.sample.json` 範例資料 |
-| 後台 `www/webadmin` | 離線示範模式，資料存在瀏覽器 localStorage |
-| 後台登入 | 未接 Supabase Auth，任何帳密都能進入 |
-| 詢價表單送出 | 未接後端，送出鍵不會傳送資料 |
-| 自動翻譯 | 未建置 |
+| `web_*` 資料表與 view | 已執行並驗證（`web_schema.sql`） |
+| `web_products_admin` view | **`web_schema_02_admin.sql` 尚未執行** |
+| 前台產品清單 | 已接 `web_products_public`；目前 0 筆，因為尚未有產品上架 |
+| 後台 `www/webadmin` | 已接 Supabase Auth 與資料表，無本機備份 |
+| 後台登入 | Supabase Auth 密碼登入，**尚未建立任何使用者帳號** |
+| 詢價表單送出 | Edge Function 程式碼完成，**尚未部署**，前台尚未接上送出邏輯 |
+| 自動翻譯 | Edge Function 程式碼完成，**尚未部署** |
 
 ---
 

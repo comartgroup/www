@@ -8,20 +8,15 @@
    正式串接方式：在 Supabase 建立只含可公開欄位的 view（web_products_public），
    對 anon 角色開放唯讀，官網只讀該 view。細節見 docs/DATA.md。
 
-   目前 SOURCE = 'sample'，讀取 assets/data/products.sample.json，
-   資料庫就緒後把 SOURCE 改成 'supabase' 並填入 SUPABASE 設定即可，頁面不需改動。
+   已接上 web_products_public。清單為空代表後台尚未有產品被標記上架，
+   那是正常狀態，不是錯誤。
    ========================================================= */
 (function () {
   "use strict";
 
-  var SOURCE = "sample";           // 'sample' | 'supabase'
-  var LANG = "en";                 // 對應 products.name / features 的 JSONB 鍵：en / zh-TW / vi
-
-  var SUPABASE = {
-    url: "",                       // 例：https://tcvlnpgpuphdalzvmoyo.supabase.co
-    anonKey: "",                   // 受 RLS 保護的 publishable key，不可放 service_role
-    view: "web_products_public"
-  };
+  var CFG = window.COMART_SUPABASE || {};
+  var VIEW = "web_products_public";
+  var LANG = "en";                 // 對應 name / features 的 JSONB 鍵：en / zh-TW / vi
 
   var grid = document.getElementById("prodGrid");
   var filterBar = document.getElementById("prodFilters");
@@ -29,26 +24,16 @@
 
   /* ---------- 資料來源 ---------- */
 
-  function fetchSample() {
-    var base = document.currentScript ? "" : "";
-    return fetch(rootPrefix() + "assets/data/products.sample.json")
-      .then(function (r) {
-        if (!r.ok) throw new Error("HTTP " + r.status);
-        return r.json();
-      })
-      .then(function (json) { return json.products || []; });
-  }
-
-  function fetchSupabase() {
+  function fetchProducts() {
     var cols = [
       "id", "series", "name", "features", "catId", "catId2", "material",
       "interface", "interfaceA", "interfaceB", "coo", "dim", "weight",
       "img", "img2", "img3", "status", "web_kind"
     ].join(",");
-    var url = SUPABASE.url + "/rest/v1/" + SUPABASE.view +
-              "?select=" + cols + "&order=series.asc";
+    var url = CFG.url + "/rest/v1/" + VIEW +
+              "?select=" + cols + "&order=sort_order.asc,series.asc";
     return fetch(url, {
-      headers: { apikey: SUPABASE.anonKey, Authorization: "Bearer " + SUPABASE.anonKey }
+      headers: { apikey: CFG.publishableKey, Authorization: "Bearer " + CFG.publishableKey }
     }).then(function (r) {
       if (!r.ok) throw new Error("HTTP " + r.status);
       return r.json();
@@ -56,13 +41,6 @@
   }
 
   /* ---------- 工具 ---------- */
-
-  // 產品頁可能位於任何目錄深度，推算回站台根目錄
-  function rootPrefix() {
-    var depth = location.pathname.replace(/\/[^/]*$/, "/").split("/").length -
-                (location.pathname.indexOf("/www/") === 0 ? 3 : 2);
-    return depth > 0 ? new Array(depth + 1).join("../") : "";
-  }
 
   // name / features 是多語 JSONB：{ "en": "...", "zh-TW": "...", "vi": "..." }
   function t(value) {
@@ -129,7 +107,12 @@
 
   /* ---------- 啟動 ---------- */
 
-  (SOURCE === "supabase" ? fetchSupabase() : fetchSample())
+  if (!CFG.url) {
+    grid.innerHTML = '<p class="prod-state is-error">Product data source is not configured.</p>';
+    return;
+  }
+
+  fetchProducts()
     .then(function (list) {
       render(list);
       buildFilters(list, list);
