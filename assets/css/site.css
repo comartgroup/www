@@ -719,3 +719,33 @@ section[id] { scroll-margin-top: calc(var(--header-h) + 8px); }
   background: rgba(171,37,46,.08); border-left-color: var(--red); color: var(--red-deep);
 }
 .placeholder-flag a { text-decoration: underline; }
+
+/* ---------- Hero 淺色變體（適合白底產品或展場渲染圖） ----------
+   目前未使用。要切換成淺色 hero 需同時改兩處：
+     src/pages/home.html      <section class="hero">        → class="hero hero--light"
+     src/partials/header.html <header class="header">       → class="header on-light"
+   然後 python3 build.py。
+   搭配的圖是 assets/img/booth-render.jpg（brand/展場照片1.png 轉出）。
+   注意：該渲染圖本身含 COMART 字標與 slogan，與頁首 logo 會重複出現。 */
+.hero--light { background: #F7F7F5; color: var(--text); }
+.hero--light .hero__media img { object-position: 62% 46%; object-fit: contain; }
+.hero--light .hero__media::after {
+  background:
+    linear-gradient(to right, rgba(247,247,245,.97) 0%, rgba(247,247,245,.92) 40%, rgba(247,247,245,.15) 78%, rgba(247,247,245,.4) 100%);
+}
+.hero--light .hero__kicker { color: var(--text-muted); }
+.hero--light h1 { color: var(--ink); }
+.hero--light h1 em { color: var(--red); }
+.hero--light .hero__sub { color: var(--text-muted); }
+.hero--light .btn--ghost { --btn-fg: var(--ink); border-color: var(--line); }
+.hero--light .btn--ghost:hover { background: rgba(0,0,0,.05); border-color: var(--ink); }
+.hero--light .hero__meta { border-top-color: var(--line); color: var(--text-muted); }
+.hero--light .hero__meta b { color: var(--ink); }
+.header.on-light:not(.is-stuck) .nav a { color: rgba(20,22,26,.78); }
+.header.on-light:not(.is-stuck) .nav a:hover { color: var(--ink); }
+.header.on-light:not(.is-stuck) .lang a { color: rgba(20,22,26,.5); }
+.header.on-light:not(.is-stuck) .lang a.is-active { color: var(--ink); }
+.header.on-light:not(.is-stuck) .lang { border-left-color: rgba(20,22,26,.18); }
+.header.on-light:not(.is-stuck) .lang .is-soon { color: rgba(20,22,26,.3); }
+.header.on-light:not(.is-stuck) .burger { border-color: rgba(20,22,26,.28); }
+.header.on-light:not(.is-stuck) .burger span { background: var(--ink); }
