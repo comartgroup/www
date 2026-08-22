@@ -937,3 +937,26 @@ section[id] { scroll-margin-top: calc(var(--header-h) + 8px); }
 
 /* 首頁的願景大字：維持氣勢但要能單行容納 */
 .vision__statement { font-size: clamp(2.1rem, 5.2vw, 4.4rem); max-width: none; }
+
+/* ---------- 產品目錄：醒目筆數與下方引導 ---------- */
+.cat-count {
+  margin-top: 44px;
+  font-family: var(--body);
+  font-size: 13px; font-weight: 600; letter-spacing: .2em; text-transform: uppercase;
+  color: var(--text-muted);
+  display: flex; align-items: baseline; gap: 12px;
+}
+.cat-count__n {
+  font-family: var(--display); font-weight: 700; font-stretch: 112%;
+  font-size: clamp(2.2rem, 4vw, 3.2rem); line-height: 1; letter-spacing: -.03em;
+  color: var(--ink);
+}
+.cat-count + .prod-filters { margin-top: 26px; }
+.prod-filters .pfilter { margin-top: 0; }
+
+.cat-more {
+  margin-top: 26px; padding: 20px 24px;
+  background: var(--paper-2); border-left: 3px solid var(--red);
+  font-size: 14.5px; line-height: 1.6; color: var(--text-muted);
+}
+.cat-more b { color: var(--text); font-weight: 600; }

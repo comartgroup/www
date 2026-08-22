@@ -18,11 +18,22 @@
   var VIEW = "web_products_public";
   var LANG = "en";                 // 對應 name / features 的 JSONB 鍵：en / zh-TW / vi
 
+  var ROWS = 5;                    // 初始只顯示 5 列，其餘引導使用搜尋
+
   var grid = document.getElementById("prodGrid");
   var filterBar = document.getElementById("prodFilters");
+  var countEl = document.getElementById("prodCount");
+  var moreEl = document.getElementById("prodMore");
   if (!grid) return;
 
   var all = [];
+
+  /** 目前的欄數由 CSS 斷點決定，直接讀 computed style 才不會寫死 */
+  function columns() {
+    var t = getComputedStyle(grid).gridTemplateColumns;
+    return Math.max(1, (t || "").split(" ").filter(function (v) { return v && v !== "0px"; }).length);
+  }
+  function limit() { return ROWS * columns(); }
 
   /* ---------- 資料來源 ---------- */
 
@@ -108,11 +119,26 @@
   function render(list) {
     if (!list.length) {
       grid.innerHTML = all.length
-        ? '<p class="prod-state">No products match your filters.</p>'
+        ? '<p class="prod-state">No products match your search.</p>'
         : '<p class="prod-state">No products published yet.</p>';
+      if (moreEl) moreEl.hidden = true;
       return;
     }
-    grid.innerHTML = list.map(card).join("");
+    var cap = limit();
+    var shown = list.slice(0, cap);
+    grid.innerHTML = shown.map(card).join("");
+
+    // 被截斷時明確告知還有多少，並引導去搜尋——而不是靜默地少給
+    if (moreEl) {
+      if (list.length > cap) {
+        moreEl.innerHTML = "Showing <b>" + shown.length + "</b> of <b>" + list.length +
+          "</b> matching products. <b>Please use keyword search</b> above, or filter by " +
+          "category, to find the rest.";
+        moreEl.hidden = false;
+      } else {
+        moreEl.hidden = true;
+      }
+    }
   }
 
   /* ---------- 搜尋與篩選 ---------- */
@@ -136,11 +162,11 @@
   function apply() {
     var list = all.filter(matches);
     render(list);
-    var count = document.getElementById("prodCount");
-    if (count) {
-      count.textContent = list.length === all.length
-        ? all.length + " products"
-        : list.length + " of " + all.length + " products";
+    if (countEl) {
+      countEl.innerHTML = list.length === all.length
+        ? '<span class="cat-count__n">' + all.length + "</span> products"
+        : '<span class="cat-count__n">' + list.length + "</span> of " + all.length + " products";
+      countEl.hidden = false;
     }
   }
 
@@ -170,7 +196,6 @@
             '<option value="platform">Existing Products</option>' +
             '<option value="quick">Quick Customization</option></select></label>'
           : "") +
-        '<span class="pfilter__count" id="prodCount"></span>' +
       "</div>";
     filterBar.hidden = false;
 
@@ -198,11 +223,16 @@
     return;
   }
 
+  var rzTimer;
+  window.addEventListener("resize", function () {
+    clearTimeout(rzTimer);
+    rzTimer = setTimeout(function () { if (all.length) apply(); }, 200);
+  });
+
   fetchProducts()
     .then(function (list) {
       all = list || [];
-      render(all);
-      if (all.length) { buildControls(); apply(); }   // apply() 讓筆數一開始就有值
+      if (all.length) { buildControls(); apply(); } else { render(all); }
     })
     .catch(function (err) {
       grid.innerHTML = '<p class="prod-state is-error">Product list is temporarily unavailable. ' +
