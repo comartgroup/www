@@ -685,3 +685,28 @@ section[id] { scroll-margin-top: calc(var(--header-h) + 8px); }
   .eqtable th, .eqtable td { padding: 11px 16px; }
   .eqtable .mdl { font-size: 12.5px; }
 }
+
+/* ---------- 里程碑時間軸 ---------- */
+.mslist { margin-top: 52px; list-style: none; padding: 0; }
+.ms {
+  display: grid; grid-template-columns: 132px minmax(0, 1fr); gap: 28px;
+  padding: 26px 0; border-top: 1px solid rgba(255,255,255,.14);
+  position: relative;
+}
+.ms:last-child { border-bottom: 1px solid rgba(255,255,255,.14); }
+.ms__year {
+  font-family: var(--display); font-weight: 700; font-stretch: 112%;
+  font-size: 1.6rem; line-height: 1; letter-spacing: -.02em; color: var(--red-bright);
+  padding-top: 2px;
+}
+.ms__body h3 { font-size: 1.12rem; font-stretch: 106%; }
+.ms__body p { margin-top: 9px; font-size: 14.5px; line-height: 1.6; color: rgba(255,255,255,.62); max-width: 62ch; }
+
+/* 淺色區塊內的版本 */
+.section:not(.on-dark) .ms { border-color: var(--line); }
+.section:not(.on-dark) .ms__body p { color: var(--text-muted); }
+
+@media (max-width: 700px) {
+  .ms { grid-template-columns: 1fr; gap: 10px; }
+  .ms__year { font-size: 1.35rem; }
+}

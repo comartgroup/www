@@ -9,6 +9,7 @@
 
 exclude:
   - src/            # 頁面樣板與內容原始檔
+  - supabase/       # Edge Function 原始碼（含後端邏輯與資料表操作）
   - docs/           # 資料架構說明與 SQL schema
   - build.py        # 靜態產生器
   - README.md
