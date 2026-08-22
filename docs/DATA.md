@@ -76,6 +76,7 @@ Edge Function，才能做驗證、防濫用與 Email 通知。
 | 繁體中文、越南文 | 未開始 |
 | `web_*` 資料表與 view | 已執行並驗證（`web_schema.sql`） |
 | `web_products_admin` view | **`web_schema_02_admin.sql` 尚未執行** |
+| 編輯者白名單 | **`web_schema_03_editors.sql` 尚未執行** |
 | 前台產品清單 | 已接 `web_products_public`；目前 0 筆，因為尚未有產品上架 |
 | 後台 `www/webadmin` | 已接 Supabase Auth 與資料表，無本機備份 |
 | 後台登入 | Supabase Auth 密碼登入，**尚未建立任何使用者帳號** |
@@ -101,6 +102,17 @@ repo 與 GitHub Pages 都是公開的，只能使用受 RLS 保護的 publishabl
 
 `www/webadmin` 部署在公開的 GitHub Pages 上，任何人都能開啟該網址。
 這是靜態前端的必然結果——真正的保護在 Supabase 的 Auth 與 RLS，不在於網址是否隱密。
+
+### 本專案為多系統共用
+
+這個 Supabase 專案同時承載報價系統、KMS、CPF 與官網。
+`web_schema.sql` 原本的政策寫成 `to authenticated using (true)`，
+代表任何登入本專案的帳號（包含 KMS 與 CPF 使用者）都能編輯官網內容。
+
+`web_schema_03_editors.sql` 建立 `web_editors` 白名單並收緊政策，
+未列名者不得寫入任何 `web_*` 資料表，也不能讀取詢價案件的客戶個資。
+
+執行順序：`web_schema.sql` → `web_schema_02_admin.sql` → `web_schema_03_editors.sql`
 
 接上正式資料庫時必須確認：
 
