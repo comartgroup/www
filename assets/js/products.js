@@ -74,22 +74,34 @@
 
   /* ---------- 繪製 ---------- */
 
-  function specLine(p) {
-    return [p.material, p.interface || p.interfaceA, p.dim, p.coo]
-      .filter(Boolean).map(esc).join(" · ");
+  /* 每項規格獨立一行；空值直接略過，不留空欄。
+     產地（coo）依 2026-08-22 指示不顯示。
+     interface 在 317 筆資料中全為空值，一併省略。 */
+  function specRows(p) {
+    var rows = [
+      ["Model", p.series],
+      ["Dimensions", p.dim],
+      ["Material", p.material]
+    ].filter(function (r) { return r[1]; });
+    if (!rows.length) return "";
+    return '<dl class="pcard__specs">' + rows.map(function (r) {
+      return "<div><dt>" + r[0] + "</dt><dd>" + esc(r[1]) + "</dd></div>";
+    }).join("") + "</dl>";
   }
 
   function card(p) {
     var img = p.img
-      ? '<div class="pcard__img"><img src="' + esc(p.img) + '" alt="" loading="lazy"></div>'
+      ? '<div class="pcard__img"><img src="' + esc(p.img) + '" alt="' +
+        esc(t(p.name) || p.series || "") + '" loading="lazy"></div>'
       : '<div class="pcard__img is-empty" aria-hidden="true"></div>';
     return '<article class="pcard">' + img +
       '<div class="pcard__body">' +
-        '<span class="pcard__kind">' + esc(kindLabel(p.web_kind)) + "</span>" +
+        '<div class="pcard__top">' +
+          '<span class="pcard__kind">' + esc(kindLabel(p.web_kind)) + "</span>" +
+          (p.cat_name ? '<span class="pcard__cat">' + esc(p.cat_name) + "</span>" : "") +
+        "</div>" +
         "<h3>" + esc(t(p.name) || p.series || p.id) + "</h3>" +
-        (p.series ? '<div class="pcard__series">' + esc(p.series) + "</div>" : "") +
-        (p.cat_name ? '<div class="pcard__cat">' + esc(p.cat_name) + "</div>" : "") +
-        (specLine(p) ? '<div class="pcard__spec">' + specLine(p) + "</div>" : "") +
+        specRows(p) +
       "</div></article>";
   }
 
@@ -190,7 +202,7 @@
     .then(function (list) {
       all = list || [];
       render(all);
-      if (all.length) buildControls();
+      if (all.length) { buildControls(); apply(); }   // apply() 讓筆數一開始就有值
     })
     .catch(function (err) {
       grid.innerHTML = '<p class="prod-state is-error">Product list is temporarily unavailable. ' +

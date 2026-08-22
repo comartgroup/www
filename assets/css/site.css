@@ -645,11 +645,28 @@ section[id] { scroll-margin-top: calc(var(--header-h) + 8px); }
 .pcard__img.is-empty {
   background: repeating-linear-gradient(135deg, var(--paper-2) 0 12px, var(--paper-3) 12px 24px);
 }
-.pcard__body { padding: 24px 24px 30px; }
+.pcard__body { padding: 22px 22px 26px; display: flex; flex-direction: column; }
+.pcard__top { display: flex; flex-wrap: wrap; align-items: baseline; gap: 8px 12px; }
 .pcard__kind { font-size: 11px; font-weight: 600; letter-spacing: .18em; text-transform: uppercase; color: var(--red); }
-.pcard h3 { margin-top: 14px; font-size: 1.06rem; font-stretch: 106%; line-height: 1.25; }
-.pcard__series { margin-top: 10px; font-size: 12.5px; letter-spacing: .1em; color: var(--silver); }
-.pcard__spec { margin-top: 12px; font-size: 13.5px; color: var(--text-muted); line-height: 1.5; }
+.pcard__cat { font-size: 11px; font-weight: 600; letter-spacing: .12em; text-transform: uppercase; color: var(--silver); }
+.pcard h3 {
+  margin-top: 14px; font-size: 1.02rem; font-stretch: 106%; line-height: 1.3;
+}
+
+/* 規格：每項一行，標籤靠左固定寬度 */
+.pcard__specs { margin: 18px 0 0; padding-top: 16px; border-top: 1px solid var(--line); }
+.pcard__specs > div {
+  display: grid; grid-template-columns: 74px minmax(0, 1fr); gap: 10px;
+  padding: 5px 0;
+}
+.pcard__specs dt {
+  font-size: 10.5px; font-weight: 600; letter-spacing: .12em; text-transform: uppercase;
+  color: var(--silver); padding-top: 2px;
+}
+.pcard__specs dd {
+  margin: 0; font-size: 13.5px; line-height: 1.45; color: var(--text-muted);
+  overflow-wrap: anywhere;
+}
 
 @media (max-width: 1180px) { .prod-catalogue { grid-template-columns: repeat(3, 1fr); } }
 @media (max-width: 860px)  { .prod-catalogue { grid-template-columns: repeat(2, 1fr); } }
@@ -800,6 +817,8 @@ section[id] { scroll-margin-top: calc(var(--header-h) + 8px); }
   overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; border: 0;
 }
 .pfilter {
+  /* 外層 .prod-filters 是 flex 容器，若不撐滿寬度這裡只會拿到內容寬 */
+  width: 100%;
   margin-top: 44px; display: flex; flex-wrap: wrap; gap: 12px; align-items: center;
 }
 .pfilter__search { flex: 0 1 360px; min-width: 220px; position: relative; }
