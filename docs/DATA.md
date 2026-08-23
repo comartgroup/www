@@ -257,3 +257,19 @@ src/pages/*.html  →  build.py  →  靜態頁面  →  commit  →  GitHub Pag
 2. GitHub Actions workflow：跑 build.py、自動 commit、觸發 Pages 重建
 3. 後台加「發布」按鈕，經 Edge Function 觸發該 workflow
    （需要一組僅能觸發 workflow 的 GitHub token，存 Edge Function secret，不進 repo）
+
+---
+
+## 九、2026-08-23 事實更新（來源：Final COMART INTRODUCTION 2026.08.21 ENGLISH PPT）
+
+| 項目 | 決定 | 說明 |
+|---|---|---|
+| 越南廠省名 | **Bac Giang → Bac Ninh** | 北江省已併入北寧省（Woody 確認）。工業區與縣名不變。**郵遞區號 26171 尚未經確認**，暫留原值 |
+| 資本額 | **刊登 USD 15,625,000** | 三語 Company 頁的公司資訊列 |
+| 員工數 | **維持 Over 200** | 不改為 250+；此數字會變動，維持保守表述 |
+| 型錄 QR code | **不做** | 規劃書 8.7 原有此要求，Woody 決定官網只提供直接下載 |
+| 注塑機台數 | **待確認** | 新檔設備清單仍為 34 台（與 20251020 完全相同），但敘述頁寫 21 台 + 9 台大型 = 30 台，無法對應。網站目前維持 34 台 |
+| 318+ 自有模具 | **待決定** | 新檔 slide 25 的新數字，規劃書未收錄 |
+
+新檔另已移除金屬加工相關頁面，與規劃書 15.4／15.6 的排除決定一致。
+設備清單三頁（射出／組裝／實驗室）比對後內容完全相同，僅 PPT 文字分段方式不同。
