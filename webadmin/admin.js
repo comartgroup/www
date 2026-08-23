@@ -622,34 +622,55 @@
   /**
    * 確認登入者真的在 web_editors 白名單內。
    *
-   * 為什麼需要這一步：本 Supabase 專案的 auth.users 由多個系統共用，
-   * 所以「密碼正確」只代表他是公司某個系統的使用者，不代表他有官網後台權限。
-   * 沒有這道檢查，KMS 或 CPF 的帳號登入後會進到一個空殼後台，看起來像壞了。
+   * 為什麼需要這一步：沒有這道檢查，不在白名單的帳號登入後會進到一個空殼後台，
+   * 每個動作都失敗，看起來像系統壞了。先擋下來並說明原因，比較好處理。
    *
-   * 這是使用者體驗的閘門，不是安全邊界——真正的防線是資料庫的 RLS
-   * （is_web_editor()），非白名單帳號就算直接打 REST API 也讀不到、寫不進。
+   * ★ 失敗模式刻意不對稱：
+   *     查到「確定不在名單裡」（HTTP 200 但零筆）→ 擋下並說明
+   *     「查不出來」（網路斷線、PostgREST 錯誤、政策異常）→ 放行，只顯示警告
+   *   因為這道閘門是體驗，不是安全邊界——真正的防線是資料庫的 RLS
+   *   （is_web_editor()），不在名單的人就算進來也讀不到、寫不進任何東西。
+   *   若查詢失敗就一律鎖死，任何一次暫時性錯誤都會把管理者關在門外，
+   *   那個代價遠大於讓一個本來就無權限的人看到空後台。
    */
   function assertEditor() {
     var me = (SB.auth.current() || {}).user || {};
+    if (!me.id) return Promise.resolve({ warn: "無法取得登入者識別碼" });
+
     // web_editors 的 select 政策本身就要求呼叫者在名單內，非編輯者會拿到空陣列
     return SB.db.select("web_editors", { user_id: "eq." + me.id, select: "user_id,role" })
       .then(function (rows) {
-        if (!rows || !rows.length) {
-          var err = new Error("此帳號沒有官網後台權限");
-          err.notEditor = true;
-          throw err;
-        }
-        return rows[0];
+        if (Array.isArray(rows) && rows.length) return rows[0];
+        var err = new Error("此帳號沒有官網後台權限");
+        err.notEditor = true;                       // 確定不在名單 → 擋
+        throw err;
+      })
+      .catch(function (err) {
+        if (err.notEditor) throw err;
+        // 查不出來就放行，把原因寫在畫面上，不要把人鎖在外面
+        if (window.console) console.warn("[webadmin] 權限查詢失敗，改為放行", err);
+        return { warn: "無法確認你的編輯權限（" + (err.message || "查詢失敗") +
+                       "）。已先讓你進入，但若每個操作都失敗，請檢查 web_editors 名單。" };
       });
   }
 
-  function enterApp() {
+  function enterApp(gate) {
     $("#login").hidden = true;
     $("#app").hidden = false;
     body = $("#viewBody"); title = $("#viewTitle"); desc = $("#viewDesc"); actions = $("#topActions");
     var u = SB.auth.current();
     var badge = $("#modeBadge");
     if (badge) badge.textContent = (u && u.user && u.user.email) || "已登入";
+    // 警告要放在 #viewBody 外面：各分頁會整批覆寫 viewBody 的內容，放裡面會被沖掉
+    if (gate && gate.warn) {
+      var note = document.createElement("div");
+      note.className = "note";
+      note.style.cssText = "margin:0;border-radius:0";
+      note.innerHTML = "<b>注意：</b>" + esc(gate.warn);
+      var main = document.querySelector(".main");
+      var vb = $("#viewBody");
+      if (main && vb) main.insertBefore(note, vb);
+    }
     views.dashboard();
   }
 
