@@ -15,6 +15,10 @@
 (function () {
   "use strict";
 
+  /* 產品清單一次抓幾筆。PostgREST 回傳筆數等於上限時無法分辨
+     「剛好這麼多」與「被截斷」，所以下面會在達到上限時明說。 */
+  var PROD_LIMIT = 2000;
+
   var LANGS = [
     { key: "en",    label: "English" },
     { key: "zh-TW", label: "繁體中文" },
@@ -292,7 +296,10 @@
       Promise.all([
         SB.db.select("web_pages", { select: "id,status" }).catch(function () { return null; }),
         SB.db.select("web_news", { select: "id,status" }).catch(function () { return null; }),
-        SB.db.select("web_product_settings", { select: "product_id,published" }).catch(function () { return null; }),
+        // 不能數 web_product_settings 的列數——新產品沒有設定行卻是上架的。
+        // 用後台 view 才與前台同一套判斷（published 且 web_eligible）。
+        SB.db.select("web_products_admin", { select: "id,published,web_eligible", limit: 2000 })
+          .catch(function () { return null; }),
         SB.db.select("web_enquiries", { select: "id,state" }).catch(function () { return null; })
       ]).then(function (r) {
         var pages = r[0], news = r[1], prods = r[2], enq = r[3];
@@ -301,7 +308,7 @@
                  '</div><span class="tag">' + tag + "</span></div>";
         }
         var live = pages ? pages.filter(function (p) { return p.status === "live"; }).length : "—";
-        var pub  = prods ? prods.filter(function (p) { return p.published; }).length : "—";
+        var pub  = prods ? prods.filter(function (p) { return p.published && p.web_eligible; }).length : "—";
         var neu  = enq ? enq.filter(function (e) { return e.state === "new"; }).length : "—";
         body.innerHTML =
           '<div class="cards">' +
@@ -418,7 +425,7 @@
       desc.textContent = "產品主檔在報價系統，這裡只決定哪些產品出現在官網";
       actions.innerHTML = "";
       busy("讀取報價系統產品清單…");
-      SB.db.select("web_products_admin", { select: "*", order: "series.asc", limit: 500 })
+      SB.db.select("web_products_admin", { select: "*", order: "series.asc", limit: PROD_LIMIT })
         .then(function (rows) {
           if (!rows.length) {
             body.innerHTML = '<div class="panel"><div class="panel__body">' +
@@ -429,14 +436,25 @@
               "3. 報價系統目前確實沒有產品資料</div></div></div>";
             return;
           }
-          body.innerHTML = '<div class="panel"><div class="panel__head"><div><h3>可上架產品</h3><p>共 ' +
+          var newCount = rows.filter(function (p) { return p.never_set && p.web_eligible; }).length;
+          body.innerHTML =
+            (rows.length >= PROD_LIMIT
+              ? '<div class="note note--warn"><b>清單可能不完整。</b>本頁一次讀取 ' + PROD_LIMIT +
+                " 筆，實際筆數已達上限，超出的產品沒有列在下面。</div>"
+              : "") +
+            '<div class="note"><b>新產品預設上架。</b>報價系統新增的產品（status = Normal）' +
+            "會自動出現在官網，不需要來這裡勾選；要隱藏才需要把開關關掉。" +
+            (newCount ? "目前有 <b>" + newCount + "</b> 項是自動上架、尚未在這裡設定過的。" : "") +
+            "</div>" +
+            '<div class="panel"><div class="panel__head"><div><h3>可上架產品</h3><p>共 ' +
             rows.length + " 項，來源：報價系統 products</p></div>" +
             '<span class="saved" id="pSaved">已儲存</span></div>' +
             "<table><thead><tr><th>產品</th><th>官網分類</th><th>上架</th></tr></thead><tbody>" +
             rows.map(function (p) {
               var nm = (p.name && (p.name.en || p.name["zh-TW"])) || p.series || p.id;
               return "<tr><td><b>" + esc(nm) + '</b><span class="sub">' + esc(p.series || p.id) +
-                (p.status ? " · " + esc(p.status) : "") + "</span></td>" +
+                (p.status ? " · " + esc(p.status) : "") +
+                (p.never_set && p.web_eligible ? " · 自動上架" : "") + "</span></td>" +
                 '<td><select data-kind="' + esc(p.id) + '">' +
                 '<option value="platform"' + (p.web_kind === "platform" ? " selected" : "") + ">Existing Product</option>" +
                 '<option value="quick"' + (p.web_kind === "quick" ? " selected" : "") + ">Quick Customization</option>" +
@@ -450,6 +468,7 @@
             if (!id) return;
             var row = rows.filter(function (r) { return r.id === id; })[0];
             if (el.dataset.pub) row.published = el.checked; else row.web_kind = el.value;
+            row.never_set = false;   // 一經 upsert 就有設定行了
             SB.db.upsert("web_product_settings", {
               product_id: id, published: row.published, web_kind: row.web_kind,
               sort_order: row.sort_order || 0, updated_at: new Date().toISOString()
