@@ -997,3 +997,10 @@ section[id] { scroll-margin-top: calc(var(--header-h) + 8px); }
 .news-list > .prod-state,
 .news-grid > .prod-state,
 .news-more { box-shadow: none; }
+
+/* 下載檔案的附註（格式與大小，讓人點之前就知道會拿到什麼） */
+.dlmeta {
+  font-size: 12.5px; letter-spacing: .08em; color: rgba(255,255,255,.55);
+  white-space: nowrap;
+}
+.section:not(.on-dark) .dlmeta { color: var(--text-muted); }
