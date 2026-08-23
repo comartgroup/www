@@ -86,6 +86,7 @@
   var ROWS = 5;                    // 初始只顯示 5 列，其餘引導使用搜尋
 
   var grid = document.getElementById("prodGrid");
+  var BASE = (grid && grid.dataset.base) || "";
   var filterBar = document.getElementById("prodFilters");
   var countEl = document.getElementById("prodCount");
   var moreEl = document.getElementById("prodMore");
@@ -202,7 +203,8 @@
     var img = p.img
       ? '<div class="pcard__img">' + imgAttrs(p.img, t(p.name) || p.series || "") + "</div>"
       : '<div class="pcard__img is-empty" aria-hidden="true"></div>';
-    return '<article class="pcard">' + img +
+    return '<a class="pcard" href="' + BASE + "products/detail/?id=" +
+      encodeURIComponent(p.id) + '">' + img +
       '<div class="pcard__body">' +
         '<div class="pcard__top">' +
           '<span class="pcard__kind">' + esc(kindLabel(p.web_kind)) + "</span>" +
@@ -210,7 +212,7 @@
         "</div>" +
         "<h3>" + esc(t(p.name) || p.series || p.id) + "</h3>" +
         specRows(p) +
-      "</div></article>";
+      "</div></a>";
   }
 
   function render(list) {

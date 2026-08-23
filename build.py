@@ -197,7 +197,11 @@ def main():
         for p in pages:
             out = l['dir'] + p['out']
             write(os.path.join(BASE, out), render(p, l, layout, header, footer, ui))
-            sitemap_entries.append(l['dir'] + page_path(p['out']))
+            # sitemap:false 的頁面不列入。產品詳細頁是靠 ?id= 取資料的空殼，
+            # 收錄它只會讓爬蟲抓到「找不到產品」。真正的產品網址帶查詢參數，
+            # 待 build.py 能讀資料庫後再改為產生靜態路徑並列入。
+            if p.get('sitemap', True):
+                sitemap_entries.append(l['dir'] + page_path(p['out']))
             if os.path.exists(os.path.join(SRC, 'pages', l['code'], p['src'])):
                 translated += 1
             total += 1

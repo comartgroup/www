@@ -87,6 +87,24 @@
     return out;
   }
 
+
+  /* 由產品詳細頁帶入的型號：預填進專案摘要，業務收到就知道是哪一項。
+     只在摘要為空時填入，不覆寫使用者已經打的字。 */
+  (function prefillProduct() {
+    var model = new URLSearchParams(location.search).get("product");
+    if (!model) return;
+    var box = document.getElementById("summary");
+    if (!box || box.value.trim()) return;
+    var LEAD = {
+      "en": "Enquiry about product ",
+      "zh-TW": "洽詢產品 ",
+      "vi": "Hỏi về sản phẩm "
+    };
+    box.value = (LEAD[LANG] || LEAD.en) + model + "\n\n";
+    var ptype = document.getElementById("ptype");
+    if (ptype) { try { box.focus(); box.setSelectionRange(box.value.length, box.value.length); } catch (e) {} }
+  })();
+
   form.addEventListener("submit", function (e) {
     e.preventDefault();
 

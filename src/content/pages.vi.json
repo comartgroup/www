@@ -53,6 +53,15 @@
       "desc": "Hai lộ trình đến sản phẩm của riêng bạn: thư viện sản phẩm mô-đun hiện có của chúng tôi, có thể kết hợp và điều chỉnh theo yêu cầu của bạn; và tùy biến nhanh logo, màu sắc, ngoại quan và bao bì trên các sản phẩm đang trong sản xuất."
     },
     {
+      "out": "products/detail/index.html",
+      "src": "product.html",
+      "nav": "products",
+      "title": "Chi tiết sản phẩm | COMART",
+      "desc": "Thông số và đặc điểm sản phẩm. COMART là đối tác ODM/OEM cho thiết bị điện tử tiêu dùng và phụ kiện ô tô.",
+      "bodyclass": "solid-header",
+      "sitemap": false
+    },
+    {
       "out": "quality-compliance/index.html",
       "title": "Chất lượng &amp; Tuân thủ | COMART",
       "desc": "Các điểm kiểm soát từ vật liệu đầu vào đến hàng xuất đi, thử nghiệm độ tin cậy và môi trường, phối hợp phòng thí nghiệm bên thứ ba, cùng các chứng nhận ở cấp tập đoàn gồm ISO 9001, ISO 14001, amfori BSCI, Sedex/SMETA và Apple MFi."

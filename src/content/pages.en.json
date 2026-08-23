@@ -73,6 +73,15 @@
       "desc": "Two routes to your own product: our existing modular product library, which can be combined and adapted to your requirement, and quick customization of products already in production through logo, colour, appearance and packaging."
     },
     {
+      "out": "products/detail/index.html",
+      "src": "product.html",
+      "nav": "products",
+      "title": "Product Detail | COMART",
+      "desc": "Product specifications and features. COMART is an ODM/OEM partner for consumer electronics and automotive accessories.",
+      "bodyclass": "solid-header",
+      "sitemap": false
+    },
+    {
       "out": "quality-compliance/index.html",
       "src": "quality-compliance.html",
       "nav": "quality",

@@ -53,6 +53,15 @@
       "desc": "打造自有產品的兩條路徑：可組合、可依需求調整的既有模組化產品；以及在量產中產品上做 Logo、顏色、外觀與包裝的快速客製化。"
     },
     {
+      "out": "products/detail/index.html",
+      "src": "product.html",
+      "nav": "products",
+      "title": "產品詳細資料 | COMART",
+      "desc": "產品規格與特色。COMART 是消費電子與汽車配件的 ODM/OEM 夥伴。",
+      "bodyclass": "solid-header",
+      "sitemap": false
+    },
+    {
       "out": "quality-compliance/index.html",
       "title": "品質與法規遵循｜COMART",
       "desc": "從進料到出貨的管控點、可靠性與環境測試、第三方實驗室協調，以及集團層級的 ISO 9001、ISO 14001、amfori BSCI、Sedex／SMETA 與 Apple MFi 等認證。"
