@@ -148,6 +148,39 @@
 
   function kindLabel(k) { return k === "quick" ? S.quick : S.existing; }
 
+  /* ---------- 圖片縮圖 ----------
+     產品圖已全數搬到 Supabase Storage（2026-08-23），可直接用內建的
+     render/image 端點做即時縮圖。實測 400px／quality 75 平均省 97.6%，
+     且會依瀏覽器的 Accept 自動回 WebP。
+
+     只改寫 Supabase 的 object 網址；其他來源（例如尚未搬完的外部圖）原樣輸出，
+     避免產生無效網址。 */
+  var OBJ = "/storage/v1/object/public/";
+  var REN = "/storage/v1/render/image/public/";
+
+  function thumb(url, w) {
+    if (!url || url.indexOf(OBJ) === -1) return url;
+    // ★ resize=contain 不可省略。只給 width 時 Supabase 預設 resize=cover，
+    //   會保留原始高度、把寬度裁掉——900x900 會變成 450x900，產品被切掉一半。
+    return url.replace(OBJ, REN) + "?width=" + w + "&quality=75&resize=contain";
+  }
+
+  function imgAttrs(url, alt) {
+    if (!url) return "";
+    if (url.indexOf(OBJ) === -1) {
+      return '<img src="' + esc(url) + '" alt="' + esc(alt) + '" loading="lazy">';
+    }
+    var widths = [300, 450, 600, 900];
+    var srcset = widths.map(function (w) {
+      return esc(thumb(url, w)) + " " + w + "w";
+    }).join(", ");
+    // 欄數：≤560 為 1、≤860 為 2、≤1180 為 3、其餘 4
+    var sizes = "(max-width: 560px) 92vw, (max-width: 860px) 46vw, " +
+                "(max-width: 1180px) 31vw, 23vw";
+    return '<img src="' + esc(thumb(url, 450)) + '" srcset="' + srcset +
+           '" sizes="' + sizes + '" alt="' + esc(alt) + '" loading="lazy" decoding="async">';
+  }
+
   /* ---------- 繪製 ---------- */
 
   /* 每項規格獨立一行；空值直接略過，不留空欄。
@@ -167,8 +200,7 @@
 
   function card(p) {
     var img = p.img
-      ? '<div class="pcard__img"><img src="' + esc(p.img) + '" alt="' +
-        esc(t(p.name) || p.series || "") + '" loading="lazy"></div>'
+      ? '<div class="pcard__img">' + imgAttrs(p.img, t(p.name) || p.series || "") + "</div>"
       : '<div class="pcard__img is-empty" aria-hidden="true"></div>';
     return '<article class="pcard">' + img +
       '<div class="pcard__body">' +
