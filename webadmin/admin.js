@@ -153,6 +153,11 @@
     });
   }
 
+  // 官網後台專用的帳號命名空間。與 Edge Function 的 NAMESPACE 及資料庫觸發器一致；
+  // 三處都改才算改完（supabase/functions/admin-users/index.ts、
+  // docs/sql/web_schema_05_editor_isolation.sql）。
+  var NAMESPACE = "@web.comart.com.tw";
+
   var ROLE_OPTS = [
     ["admin",     "管理者 — 含使用者管理"],
     ["editor",    "內容編輯 — 頁面與動態"],
@@ -171,7 +176,8 @@
       '<div class="fieldrow"><label>臨時密碼</label>' +
       '<input type="text" value="' + esc(pw) + '" readonly id="tmpPw"></div>' +
       '<div class="note"><b>請自行轉達給對方，不要用 email 寄。</b>' +
-      "本專案沒有設定寄信服務，系統不會通知對方。請要求對方登入後立即更改密碼。</div>" +
+      "官網帳號沒有信箱也不會收信，系統不會通知對方。" +
+      "密碼為 10 碼，含大小寫、數字與符號，已排除看起來相似的字元（I O l 0 1）。</div>" +
       '<div class="rowactions"><button class="btn" id="copyPw">複製</button>' +
       '<span class="saved" id="pwCopied">已複製</span></div></div></div>';
     host.scrollIntoView({ behavior: "smooth", block: "start" });
@@ -183,29 +189,36 @@
 
   function renderUserForm() {
     var host = $("#userForm");
-    host.innerHTML = '<div class="panel"><div class="panel__head"><div><h3>新增使用者</h3>' +
-      "<p>這個 Supabase 專案只有一份使用者名冊，官網與報價系統、CRM、KMS、CPF、" +
-      "內部 Portal 共用</p></div></div>" +
+    host.innerHTML = '<div class="panel"><div class="panel__head"><div><h3>新增官網編輯者</h3>' +
+      "<p>官網後台使用獨立帳號，與報價系統、CRM、KMS、CPF、內部 Portal 完全分開</p>" +
+      "</div></div>" +
       '<div class="panel__body">' +
-      '<div class="fieldrow"><label>Email</label>' +
-      '<input type="email" id="nuEmail" placeholder="name@comart.com.tw"></div>' +
+      '<div class="fieldrow"><label>帳號名稱</label>' +
+      '<span class="nsinput"><input type="text" id="nuName" placeholder="chen" ' +
+      'autocomplete="off" spellcheck="false">' +
+      '<span class="nssuffix">' + esc(NAMESPACE) + "</span></span></div>" +
       '<div class="fieldrow"><label>權限</label><select id="nuRole">' +
       ROLE_OPTS.map(function (o) { return '<option value="' + o[0] + '">' + o[1] + "</option>"; }).join("") +
       "</select></div>" +
       '<div class="note" style="margin-top:20px">' +
-      "<b>建立新帳號</b>：這個 email 從未在本專案出現過，會建一組新帳號並顯示臨時密碼。<br>" +
-      "<b>加入既有帳號</b>：這個 email 已經有帳號（例如他已經在用 KMS 或報價系統），" +
-      "只把他加進官網編輯名單，<b>不會變更他原有的密碼</b>。<br>" +
-      "不確定按哪一顆就先按「建立新帳號」，若已存在系統會提示你改用另一顆。</div>" +
+      "<b>這是登入識別碼，不是信箱。</b>" + esc(NAMESPACE) + " 不需要真的存在也不會收信，" +
+      "所以請不要填同事的公司信箱——那會讓同一組帳號密碼同時開得了官網後台與 KMS。<br><br>" +
+      "<b>建立官網帳號</b>：建一組全新的官網專屬帳號，並顯示一次性密碼。<br>" +
+      "<b>重新啟用</b>：這個官網帳號以前建過、後來被收回權限，把他加回名單，" +
+      "<b>密碼不變</b>；對方若不記得密碼，加回後再按「重設密碼」。</div>" +
       '<div class="rowactions">' +
-      '<button class="btn btn--primary" id="nuCreate">建立新帳號</button>' +
-      '<button class="btn" id="nuGrant">加入既有帳號</button>' +
+      '<button class="btn btn--primary" id="nuCreate">建立官網帳號</button>' +
+      '<button class="btn" id="nuGrant">重新啟用</button>' +
       '<span class="saved" id="nuState"></span></div></div></div>';
     host.scrollIntoView({ behavior: "smooth", block: "start" });
 
     function run(action) {
-      var email = $("#nuEmail").value.trim();
-      if (!email) { flash($("#nuState"), "請輸入 Email"); return; }
+      var name = $("#nuName").value.trim().toLowerCase();
+      if (!name) { flash($("#nuState"), "請輸入帳號名稱"); return; }
+      // 貼上完整 email 時只取 @ 前面，避免組出 chen@comart.com.tw@web.comart.com.tw
+      name = name.split("@")[0].replace(/[^a-z0-9._-]/g, "");
+      if (!name) { flash($("#nuState"), "帳號名稱只能用英數字與 . _ -"); return; }
+      var email = name + NAMESPACE;
       var role = $("#nuRole").value;
       $("#nuCreate").disabled = $("#nuGrant").disabled = true;
       SB.fn.users(action, { email: email, role: role })
@@ -464,14 +477,17 @@
               "</td></tr>";
           }).join("") + "</tbody></table></div>" +
           '<div id="userForm"></div>' +
-          '<div class="panel"><div class="panel__head"><div><h3>關於權限</h3>' +
-          "<p>本 Supabase 專案由報價系統、KMS 與官網共用</p></div></div>" +
+          '<div class="panel"><div class="panel__head"><div><h3>關於帳號與權限</h3>' +
+          "<p>官網後台帳號與其他系統脫鉤</p></div></div>" +
           '<div class="panel__body">' +
-          '<div class="note"><b>「收回權限」不會刪除帳號。</b>只會把人移出官網編輯名單。' +
-          "本專案的使用者名冊由官網、報價系統、CRM、KMS、CPF 與內部 Portal 共用，" +
-          "該帳號的 UUID 可能被其他系統參照，刪掉會在別處造成孤兒資料。</div>" +
-          '<div class="note"><b>密碼由管理者轉達。</b>本專案沒有設定寄信服務，' +
-          "所以重設密碼不會寄信，而是在畫面上顯示一次臨時密碼，請你自行轉達並要求對方登入後更改。</div>" +
+          '<div class="note"><b>官網帳號一律是 ' + esc(NAMESPACE) + " 結尾。</b>" +
+          "這是登入識別碼而非信箱，不會收信。因此其他系統（報價系統、CRM、KMS、CPF、" +
+          "內部 Portal）的帳號無法加入這份名單，官網的密碼與那些系統互不相干。</div>" +
+          '<div class="note"><b>「收回權限」不會刪除帳號。</b>只會把人移出官網編輯名單；' +
+          "移出後該帳號就無法登入這個後台，也讀不到任何官網資料。" +
+          "需要徹底刪除帳號時，請在 Supabase Dashboard 執行。</div>" +
+          '<div class="note"><b>密碼由管理者轉達。</b>官網帳號沒有信箱，所以重設密碼不會寄信，' +
+          "而是在畫面上顯示一次密碼（10 碼，含大小寫與符號），請你自行轉達。</div>" +
           "</div></div>";
 
         body.onclick = function (e) {
@@ -609,6 +625,30 @@
 
   /* ---------- 啟動 ---------- */
 
+  /**
+   * 確認登入者真的在 web_editors 白名單內。
+   *
+   * 為什麼需要這一步：本 Supabase 專案的 auth.users 由多個系統共用，
+   * 所以「密碼正確」只代表他是公司某個系統的使用者，不代表他有官網後台權限。
+   * 沒有這道檢查，KMS 或 CPF 的帳號登入後會進到一個空殼後台，看起來像壞了。
+   *
+   * 這是使用者體驗的閘門，不是安全邊界——真正的防線是資料庫的 RLS
+   * （is_web_editor()），非白名單帳號就算直接打 REST API 也讀不到、寫不進。
+   */
+  function assertEditor() {
+    var me = (SB.auth.current() || {}).user || {};
+    // web_editors 的 select 政策本身就要求呼叫者在名單內，非編輯者會拿到空陣列
+    return SB.db.select("web_editors", { user_id: "eq." + me.id, select: "user_id,role" })
+      .then(function (rows) {
+        if (!rows || !rows.length) {
+          var err = new Error("此帳號沒有官網後台權限");
+          err.notEditor = true;
+          throw err;
+        }
+        return rows[0];
+      });
+  }
+
   function enterApp() {
     $("#login").hidden = true;
     $("#app").hidden = false;
@@ -629,11 +669,20 @@
       if (!email || !pass) { note.innerHTML = "請輸入 Email 與密碼。"; return; }
       btn.disabled = true; btn.textContent = "登入中…";
       SB.auth.signIn(email, pass)
+        .then(assertEditor)
         .then(enterApp)
         .catch(function (err) {
-          note.innerHTML = err.status === 400
-            ? "<b>登入失敗。</b>帳號或密碼不正確。"
-            : "<b>登入失敗。</b>" + esc(err.message || "");
+          if (err.notEditor) {
+            // 密碼是對的，但這個帳號屬於其他系統——清掉 session，不要留在半登入狀態
+            SB.auth.signOut();
+            note.innerHTML = "<b>這個帳號沒有官網後台權限。</b>官網後台使用獨立帳號，" +
+              "識別碼結尾為 " + esc(NAMESPACE) + "；報價系統、CRM、KMS、CPF、" +
+              "內部 Portal 的帳號無法登入這裡。請向官網管理者索取官網帳號。";
+          } else {
+            note.innerHTML = err.status === 400
+              ? "<b>登入失敗。</b>帳號或密碼不正確。"
+              : "<b>登入失敗。</b>" + esc(err.message || "");
+          }
           btn.disabled = false; btn.textContent = "登入";
         });
     });
@@ -651,9 +700,15 @@
       SB.auth.signOut().then(function () { location.reload(); });
     });
 
-    // 已有未過期的 session 就直接進去
+    // 已有未過期的 session 就直接進去，但同樣要確認權限沒被收回
     if (SB.auth.current()) {
-      SB.auth.ensure().then(enterApp).catch(function () { /* 留在登入頁 */ });
+      SB.auth.ensure()
+        .then(assertEditor)
+        .then(enterApp)
+        .catch(function (err) {
+          if (err && err.notEditor) SB.auth.signOut();   // 權限已被收回，清掉舊 session
+          /* 其餘情況留在登入頁 */
+        });
     }
   });
 })();
