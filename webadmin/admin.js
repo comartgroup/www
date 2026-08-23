@@ -160,72 +160,124 @@
     ["publisher", "發布者 — 可切換上線狀態"]
   ];
 
-  function showTempPassword(email, pw) {
-    if (!pw) return;
-    var host = $("#userForm") || body;
-    host.innerHTML = '<div class="panel"><div class="panel__head"><div><h3>臨時密碼</h3>' +
-      "<p>只會顯示這一次，關掉就看不到了</p></div></div>" +
-      '<div class="panel__body">' +
-      (email ? '<div class="fieldrow"><label>帳號</label><input type="text" value="' +
-               esc(email) + '" readonly></div>' : "") +
-      '<div class="fieldrow"><label>臨時密碼</label>' +
-      '<input type="text" value="' + esc(pw) + '" readonly id="tmpPw"></div>' +
-      '<div class="note"><b>請自行轉達給對方，不要用 email 寄。</b>' +
-      "本專案沒有設定寄信服務，系統不會通知對方。" +
-      "密碼為 10 碼，含大小寫、數字與符號，已排除看起來相似的字元（I O l 0 1）。" +
-      "請要求對方登入後立即更改密碼。</div>" +
-      '<div class="rowactions"><button class="btn" id="copyPw">複製</button>' +
-      '<span class="saved" id="pwCopied">已複製</span></div></div></div>';
-    host.scrollIntoView({ behavior: "smooth", block: "start" });
-    $("#copyPw").onclick = function () {
-      var el = $("#tmpPw"); el.select();
-      navigator.clipboard.writeText(el.value).then(function () { flash($("#pwCopied"), "已複製"); });
+  var PW_HINT = "至少 10 碼，須含大寫、小寫與符號。";
+
+  /** 密碼原則檢查。與 Edge Function 的 passwordProblem 同一套規則；
+      這裡只是讓使用者少跑一趟，真正的關卡在伺服器端。 */
+  function pwProblem(pw) {
+    if (!pw) return "請輸入密碼";
+    if (pw.length < 10) return "密碼至少 10 碼";
+    if (!/[A-Z]/.test(pw)) return "密碼需包含大寫字母";
+    if (!/[a-z]/.test(pw)) return "密碼需包含小寫字母";
+    if (!/[^A-Za-z0-9]/.test(pw)) return "密碼需包含符號";
+    return null;
+  }
+
+  /** 密碼輸入列：附即時檢查與顯示／隱藏切換 */
+  function pwField(id, label) {
+    return '<div class="fieldrow"><label>' + esc(label) + "</label>" +
+      '<div class="pwrow">' +
+        '<input type="password" id="' + id + '" autocomplete="new-password" ' +
+        'spellcheck="false" placeholder="' + esc(PW_HINT) + '">' +
+        '<button type="button" class="btn btn--sm" data-reveal="' + id + '">顯示</button>' +
+      "</div>" +
+      '<div class="hint" id="' + id + 'Hint">' + esc(PW_HINT) + "</div></div>";
+  }
+
+  /** 綁定顯示切換與即時檢查 */
+  function wirePwField(root, id) {
+    var input = $("#" + id, root);
+    var hint = $("#" + id + "Hint", root);
+    var btn = root.querySelector('[data-reveal="' + id + '"]');
+    if (btn) btn.onclick = function () {
+      var show = input.type === "password";
+      input.type = show ? "text" : "password";
+      btn.textContent = show ? "隱藏" : "顯示";
     };
+    input.addEventListener("input", function () {
+      if (!input.value) { hint.textContent = PW_HINT; hint.className = "hint"; return; }
+      var bad = pwProblem(input.value);
+      hint.textContent = bad || "符合原則";
+      hint.className = bad ? "hint is-bad" : "hint is-ok";
+    });
+    return input;
   }
 
   function renderUserForm() {
     var host = $("#userForm");
     host.innerHTML = '<div class="panel"><div class="panel__head"><div><h3>新增使用者</h3>' +
-      "<p>使用同事原本的公司帳號。本專案的使用者名冊由官網與報價系統、CRM、KMS、CPF、" +
-      "內部 Portal 共用</p></div></div>" +
+      "<p>密碼由你設定，之後自行轉達給對方</p></div></div>" +
       '<div class="panel__body">' +
       '<div class="fieldrow"><label>Email</label>' +
       '<input type="email" id="nuEmail" placeholder="name@comart.com.tw" ' +
       'autocomplete="off" spellcheck="false"></div>' +
+      pwField("nuPw", "密碼") +
       '<div class="fieldrow"><label>權限</label><select id="nuRole">' +
       ROLE_OPTS.map(function (o) { return '<option value="' + o[0] + '">' + o[1] + "</option>"; }).join("") +
       "</select></div>" +
       '<div class="note" style="margin-top:20px">' +
-      "<b>建立新帳號</b>：這個 email 從未在本專案出現過，會建一組新帳號並顯示一次性密碼" +
-      "（10 碼，含大小寫與符號）。<br>" +
-      "<b>加入既有帳號</b>：這個 email 已經有帳號（例如他已經在用 KMS 或報價系統），" +
-      "只把他加進官網編輯名單，<b>不會變更他原有的密碼</b>——他用原本的密碼登入官網後台。<br>" +
-      "不確定按哪一顆就先按「建立新帳號」，若已存在系統會提示你改用另一顆。</div>" +
+      "此密碼<b>只用於官網後台</b>，與 KMS、報價系統、CRM、CPF、內部 Portal 各自獨立——" +
+      "那些系統是用工號登入、密碼另存一套，在這裡設定不會影響它們。<br>" +
+      "系統不會寄信通知，請自行把帳號與密碼轉達給對方。<br>" +
+      "若這個 Email 已經有帳號，只會把他加進編輯名單，<b>不會變更他原有的密碼</b>。</div>" +
       '<div class="rowactions">' +
-      '<button class="btn btn--primary" id="nuCreate">建立新帳號</button>' +
-      '<button class="btn" id="nuGrant">加入既有帳號</button>' +
+      '<button class="btn btn--primary" id="nuCreate">新增使用者</button>' +
       '<span class="saved" id="nuState"></span></div></div></div>';
     host.scrollIntoView({ behavior: "smooth", block: "start" });
 
-    function run(action) {
+    var pw = wirePwField(host, "nuPw");
+
+    $("#nuCreate").onclick = function () {
       var email = $("#nuEmail").value.trim().toLowerCase();
-      if (!email) { flash($("#nuState"), "請輸入 Email"); return; }
-      if (email.indexOf("@") < 1) { flash($("#nuState"), "Email 格式看起來不對"); return; }
-      var role = $("#nuRole").value;
-      $("#nuCreate").disabled = $("#nuGrant").disabled = true;
-      SB.fn.users(action, { email: email, role: role })
+      if (!email || email.indexOf("@") < 1) { flash($("#nuState"), "Email 格式看起來不對"); return; }
+      var bad = pwProblem(pw.value);
+      if (bad) { flash($("#nuState"), bad); pw.focus(); return; }
+
+      var btn = this; btn.disabled = true;
+      SB.fn.users("create", { email: email, password: pw.value, role: $("#nuRole").value })
         .then(function (r) {
-          if (r.temp_password) showTempPassword(email, r.temp_password);
-          else { flash($("#nuState"), "已加入"); views.users(); }
+          pw.value = "";
+          flash($("#nuState"), r.existed ? "已加入編輯名單（未變更原有密碼）" : "已建立");
+          views.users();
         })
         .catch(function (err) {
-          var m = (err.body && err.body.message) || err.message || "";
-          flash($("#nuState"), m);
-          $("#nuCreate").disabled = $("#nuGrant").disabled = false;
+          flash($("#nuState"), (err.body && err.body.message) || err.message || "失敗");
+          btn.disabled = false;
         });
-    }
-    $("#nuCreate").onclick = function () { run("create"); };
-    $("#nuGrant").onclick  = function () { run("grant"); };
+    };
+  }
+
+  /** 由管理者指定新密碼 */
+  function renderPwForm(userId, email) {
+    var host = $("#userForm");
+    host.innerHTML = '<div class="panel"><div class="panel__head"><div><h3>更改密碼</h3>' +
+      "<p>" + esc(email || userId) + "</p></div></div>" +
+      '<div class="panel__body">' +
+      pwField("spPw", "新密碼") +
+      '<div class="note">舊密碼會立即失效。系統不會寄信通知，請自行轉達給對方。</div>' +
+      '<div class="rowactions"><button class="btn btn--primary" id="spSave">更改密碼</button>' +
+      '<button class="btn" id="spCancel">取消</button>' +
+      '<span class="saved" id="spState"></span></div></div></div>';
+    host.scrollIntoView({ behavior: "smooth", block: "start" });
+
+    var pw = wirePwField(host, "spPw");
+    $("#spCancel").onclick = function () { host.innerHTML = ""; };
+
+    $("#spSave").onclick = function () {
+      var bad = pwProblem(pw.value);
+      if (bad) { flash($("#spState"), bad); pw.focus(); return; }
+      var btn = this; btn.disabled = true;
+      SB.fn.users("set_password", { user_id: userId, password: pw.value })
+        .then(function () {
+          pw.value = "";
+          flash($("#spState"), "已更改");
+          setTimeout(function () { host.innerHTML = ""; }, 1600);
+        })
+        .catch(function (err) {
+          flash($("#spState"), (err.body && err.body.message) || err.message || "失敗");
+          btn.disabled = false;
+        });
+    };
   }
 
   /* ---------- 各分頁 ---------- */
@@ -463,44 +515,42 @@
               }).join("") + "</select></td>" +
               "<td>" + esc(u.last_sign_in_at ? u.last_sign_in_at.slice(0, 10) : "從未登入") + "</td>" +
               '<td style="text-align:right">' +
-              '<button class="btn btn--sm" data-pw="' + esc(u.user_id) + '">重設密碼</button> ' +
-              (isMe ? "" : '<button class="btn btn--sm" data-revoke="' + esc(u.user_id) +
-                           '" data-email="' + esc(u.email || "") + '">收回權限</button>') +
+              '<button class="btn btn--sm" data-pw="' + esc(u.user_id) +
+                '" data-email="' + esc(u.email || "") + '">更改密碼</button> ' +
+              (isMe ? "" : '<button class="btn btn--sm" data-remove="' + esc(u.user_id) +
+                           '" data-email="' + esc(u.email || "") + '">刪除使用者</button>') +
               "</td></tr>";
           }).join("") + "</tbody></table></div>" +
           '<div id="userForm"></div>' +
           '<div class="panel"><div class="panel__head"><div><h3>關於帳號與權限</h3>' +
-          "<p>本 Supabase 專案的帳號名冊由官網與報價系統、CRM、KMS、CPF、內部 Portal 共用</p>" +
-          "</div></div>" +
+          "<p>官網後台的帳號與密碼獨立於其他系統</p></div></div>" +
           '<div class="panel__body">' +
-          '<div class="note"><b>「授權」與「密碼」是兩件事。</b>' +
-          "授權由這份名單控制——沒列在這裡的人登入會被擋在門外，也讀不到任何官網資料。" +
-          "但密碼是與其他系統共用的：同一組密碼一旦外洩，官網後台與那些系統會一起受影響。</div>" +
-          '<div class="note"><b>「收回權限」不會刪除帳號。</b>只會把人移出官網編輯名單；' +
-          "移出後他就進不了這個後台，但仍可正常使用其他系統。" +
-          "不要去刪除 auth 帳號——該 UUID 可能被其他系統參照，刪掉會在別處造成孤兒資料。</div>" +
-          '<div class="note"><b>密碼由管理者轉達。</b>本專案沒有設定寄信服務，所以重設密碼不會寄信，' +
-          "而是在畫面上顯示一次密碼（10 碼，含大小寫與符號），請你自行轉達。<br>" +
-          "注意：「加入既有帳號」不會動到對方的密碼，那組密碼是當初建立它的系統設的。</div>" +
+          '<div class="note"><b>登入方式是 Email，不是工號。</b>' +
+          "KMS、報價系統、CRM、CPF 與內部 Portal 是用工號登入、密碼另存一套，" +
+          "與這裡完全獨立。在這裡設定或更改密碼<b>不會影響那些系統</b>，反之亦然。</div>" +
+          '<div class="note"><b>密碼由你設定並自行轉達。</b>' +
+          "系統沒有寄信通知的機制，新增使用者或更改密碼都不會通知對方。" +
+          "原則是至少 10 碼、含大寫、小寫與符號。</div>" +
+          '<div class="note"><b>「刪除使用者」會移出編輯名單並刪除帳號。</b>' +
+          "唯一例外是該帳號在 CPF 系統另有資料時——那種情況只收回官網權限、保留帳號本身，" +
+          "避免影響 CPF 那邊的紀錄，畫面上會告知。</div>" +
           "</div></div>";
 
         body.onclick = function (e) {
           var pw = e.target.closest("[data-pw]");
-          var rv = e.target.closest("[data-revoke]");
-          if (pw) {
-            if (!confirm("重設這個帳號的密碼？舊密碼會立即失效。")) return;
-            pw.disabled = true; pw.textContent = "處理中…";
-            SB.fn.users("set_password", { user_id: pw.dataset.pw })
-              .then(function (r2) { showTempPassword(null, r2.temp_password); })
-              .catch(function (err) { alert("重設失敗：" + (err.message || "")); })
-              .then(function () { views.users(); });
-          }
-          if (rv) {
-            if (!confirm("收回 " + (rv.dataset.email || "這個帳號") +
-                         " 的官網編輯權限？\n\n帳號本身不會被刪除，其他系統不受影響。")) return;
-            SB.fn.users("revoke", { user_id: rv.dataset.revoke })
-              .then(views.users)
-              .catch(function (err) { alert("收回失敗：" + (err.message || "")); });
+          var rm = e.target.closest("[data-remove]");
+          if (pw) renderPwForm(pw.dataset.pw, pw.dataset.email);
+          if (rm) {
+            if (!confirm("刪除 " + (rm.dataset.email || "這個帳號") + "？\n\n" +
+                         "會移出編輯名單並刪除帳號，此動作無法復原。")) return;
+            SB.fn.users("remove", { user_id: rm.dataset.remove })
+              .then(function (r2) {
+                if (r2 && r2.account_deleted === false && r2.note) alert(r2.note);
+                views.users();
+              })
+              .catch(function (err) {
+                alert("刪除失敗：" + ((err.body && err.body.error) || err.message || ""));
+              });
           }
         };
 
@@ -688,11 +738,11 @@
         .then(enterApp)
         .catch(function (err) {
           if (err.notEditor) {
-            // 密碼是對的，但這個帳號屬於其他系統——清掉 session，不要留在半登入狀態
+            // 密碼是對的，但不在編輯名單裡——清掉 session，不要留在半登入狀態
             SB.auth.signOut();
-            note.innerHTML = "<b>帳號密碼正確，但這個帳號沒有官網後台權限。</b>" +
-              "本公司的帳號名冊由官網與報價系統、CRM、KMS、CPF、內部 Portal 共用，" +
-              "能登入其他系統不代表能編輯官網。請向官網管理者申請加入編輯名單。";
+            note.innerHTML = "<b>帳號密碼正確，但這個帳號不在官網編輯名單裡。</b>" +
+              "官網後台的權限由編輯名單控制，與帳號本身是兩件事。" +
+              "請向官網管理者申請加入。";
           } else {
             note.innerHTML = err.status === 400
               ? "<b>登入失敗。</b>帳號或密碼不正確。"
