@@ -153,11 +153,6 @@
     });
   }
 
-  // 官網後台專用的帳號命名空間。與 Edge Function 的 NAMESPACE 及資料庫觸發器一致；
-  // 三處都改才算改完（supabase/functions/admin-users/index.ts、
-  // docs/sql/web_schema_05_editor_isolation.sql）。
-  var NAMESPACE = "@web.comart.com.tw";
-
   var ROLE_OPTS = [
     ["admin",     "管理者 — 含使用者管理"],
     ["editor",    "內容編輯 — 頁面與動態"],
@@ -176,8 +171,9 @@
       '<div class="fieldrow"><label>臨時密碼</label>' +
       '<input type="text" value="' + esc(pw) + '" readonly id="tmpPw"></div>' +
       '<div class="note"><b>請自行轉達給對方，不要用 email 寄。</b>' +
-      "官網帳號沒有信箱也不會收信，系統不會通知對方。" +
-      "密碼為 10 碼，含大小寫、數字與符號，已排除看起來相似的字元（I O l 0 1）。</div>" +
+      "本專案沒有設定寄信服務，系統不會通知對方。" +
+      "密碼為 10 碼，含大小寫、數字與符號，已排除看起來相似的字元（I O l 0 1）。" +
+      "請要求對方登入後立即更改密碼。</div>" +
       '<div class="rowactions"><button class="btn" id="copyPw">複製</button>' +
       '<span class="saved" id="pwCopied">已複製</span></div></div></div>';
     host.scrollIntoView({ behavior: "smooth", block: "start" });
@@ -189,36 +185,32 @@
 
   function renderUserForm() {
     var host = $("#userForm");
-    host.innerHTML = '<div class="panel"><div class="panel__head"><div><h3>新增官網編輯者</h3>' +
-      "<p>官網後台使用獨立帳號，與報價系統、CRM、KMS、CPF、內部 Portal 完全分開</p>" +
-      "</div></div>" +
+    host.innerHTML = '<div class="panel"><div class="panel__head"><div><h3>新增使用者</h3>' +
+      "<p>使用同事原本的公司帳號。本專案的使用者名冊由官網與報價系統、CRM、KMS、CPF、" +
+      "內部 Portal 共用</p></div></div>" +
       '<div class="panel__body">' +
-      '<div class="fieldrow"><label>帳號名稱</label>' +
-      '<span class="nsinput"><input type="text" id="nuName" placeholder="chen" ' +
-      'autocomplete="off" spellcheck="false">' +
-      '<span class="nssuffix">' + esc(NAMESPACE) + "</span></span></div>" +
+      '<div class="fieldrow"><label>Email</label>' +
+      '<input type="email" id="nuEmail" placeholder="name@comart.com.tw" ' +
+      'autocomplete="off" spellcheck="false"></div>' +
       '<div class="fieldrow"><label>權限</label><select id="nuRole">' +
       ROLE_OPTS.map(function (o) { return '<option value="' + o[0] + '">' + o[1] + "</option>"; }).join("") +
       "</select></div>" +
       '<div class="note" style="margin-top:20px">' +
-      "<b>這是登入識別碼，不是信箱。</b>" + esc(NAMESPACE) + " 不需要真的存在也不會收信，" +
-      "所以請不要填同事的公司信箱——那會讓同一組帳號密碼同時開得了官網後台與 KMS。<br><br>" +
-      "<b>建立官網帳號</b>：建一組全新的官網專屬帳號，並顯示一次性密碼。<br>" +
-      "<b>重新啟用</b>：這個官網帳號以前建過、後來被收回權限，把他加回名單，" +
-      "<b>密碼不變</b>；對方若不記得密碼，加回後再按「重設密碼」。</div>" +
+      "<b>建立新帳號</b>：這個 email 從未在本專案出現過，會建一組新帳號並顯示一次性密碼" +
+      "（10 碼，含大小寫與符號）。<br>" +
+      "<b>加入既有帳號</b>：這個 email 已經有帳號（例如他已經在用 KMS 或報價系統），" +
+      "只把他加進官網編輯名單，<b>不會變更他原有的密碼</b>——他用原本的密碼登入官網後台。<br>" +
+      "不確定按哪一顆就先按「建立新帳號」，若已存在系統會提示你改用另一顆。</div>" +
       '<div class="rowactions">' +
-      '<button class="btn btn--primary" id="nuCreate">建立官網帳號</button>' +
-      '<button class="btn" id="nuGrant">重新啟用</button>' +
+      '<button class="btn btn--primary" id="nuCreate">建立新帳號</button>' +
+      '<button class="btn" id="nuGrant">加入既有帳號</button>' +
       '<span class="saved" id="nuState"></span></div></div></div>';
     host.scrollIntoView({ behavior: "smooth", block: "start" });
 
     function run(action) {
-      var name = $("#nuName").value.trim().toLowerCase();
-      if (!name) { flash($("#nuState"), "請輸入帳號名稱"); return; }
-      // 貼上完整 email 時只取 @ 前面，避免組出 chen@comart.com.tw@web.comart.com.tw
-      name = name.split("@")[0].replace(/[^a-z0-9._-]/g, "");
-      if (!name) { flash($("#nuState"), "帳號名稱只能用英數字與 . _ -"); return; }
-      var email = name + NAMESPACE;
+      var email = $("#nuEmail").value.trim().toLowerCase();
+      if (!email) { flash($("#nuState"), "請輸入 Email"); return; }
+      if (email.indexOf("@") < 1) { flash($("#nuState"), "Email 格式看起來不對"); return; }
       var role = $("#nuRole").value;
       $("#nuCreate").disabled = $("#nuGrant").disabled = true;
       SB.fn.users(action, { email: email, role: role })
@@ -478,16 +470,18 @@
           }).join("") + "</tbody></table></div>" +
           '<div id="userForm"></div>' +
           '<div class="panel"><div class="panel__head"><div><h3>關於帳號與權限</h3>' +
-          "<p>官網後台帳號與其他系統脫鉤</p></div></div>" +
+          "<p>本 Supabase 專案的帳號名冊由官網與報價系統、CRM、KMS、CPF、內部 Portal 共用</p>" +
+          "</div></div>" +
           '<div class="panel__body">' +
-          '<div class="note"><b>官網帳號一律是 ' + esc(NAMESPACE) + " 結尾。</b>" +
-          "這是登入識別碼而非信箱，不會收信。因此其他系統（報價系統、CRM、KMS、CPF、" +
-          "內部 Portal）的帳號無法加入這份名單，官網的密碼與那些系統互不相干。</div>" +
+          '<div class="note"><b>「授權」與「密碼」是兩件事。</b>' +
+          "授權由這份名單控制——沒列在這裡的人登入會被擋在門外，也讀不到任何官網資料。" +
+          "但密碼是與其他系統共用的：同一組密碼一旦外洩，官網後台與那些系統會一起受影響。</div>" +
           '<div class="note"><b>「收回權限」不會刪除帳號。</b>只會把人移出官網編輯名單；' +
-          "移出後該帳號就無法登入這個後台，也讀不到任何官網資料。" +
-          "需要徹底刪除帳號時，請在 Supabase Dashboard 執行。</div>" +
-          '<div class="note"><b>密碼由管理者轉達。</b>官網帳號沒有信箱，所以重設密碼不會寄信，' +
-          "而是在畫面上顯示一次密碼（10 碼，含大小寫與符號），請你自行轉達。</div>" +
+          "移出後他就進不了這個後台，但仍可正常使用其他系統。" +
+          "不要去刪除 auth 帳號——該 UUID 可能被其他系統參照，刪掉會在別處造成孤兒資料。</div>" +
+          '<div class="note"><b>密碼由管理者轉達。</b>本專案沒有設定寄信服務，所以重設密碼不會寄信，' +
+          "而是在畫面上顯示一次密碼（10 碼，含大小寫與符號），請你自行轉達。<br>" +
+          "注意：「加入既有帳號」不會動到對方的密碼，那組密碼是當初建立它的系統設的。</div>" +
           "</div></div>";
 
         body.onclick = function (e) {
@@ -675,9 +669,9 @@
           if (err.notEditor) {
             // 密碼是對的，但這個帳號屬於其他系統——清掉 session，不要留在半登入狀態
             SB.auth.signOut();
-            note.innerHTML = "<b>這個帳號沒有官網後台權限。</b>官網後台使用獨立帳號，" +
-              "識別碼結尾為 " + esc(NAMESPACE) + "；報價系統、CRM、KMS、CPF、" +
-              "內部 Portal 的帳號無法登入這裡。請向官網管理者索取官網帳號。";
+            note.innerHTML = "<b>帳號密碼正確，但這個帳號沒有官網後台權限。</b>" +
+              "本公司的帳號名冊由官網與報價系統、CRM、KMS、CPF、內部 Portal 共用，" +
+              "能登入其他系統不代表能編輯官網。請向官網管理者申請加入編輯名單。";
           } else {
             note.innerHTML = err.status === 400
               ? "<b>登入失敗。</b>帳號或密碼不正確。"

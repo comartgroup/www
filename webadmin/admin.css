@@ -142,16 +142,6 @@ td .sub { display: block; margin-top: 4px; font-size: 12px; color: var(--muted);
 .fieldrow textarea { min-height: 120px; resize: vertical; line-height: 1.6; }
 .fieldrow .hint { font-size: 12px; color: var(--muted); }
 
-/* 帳號名稱 + 固定命名空間後綴。後綴是唯讀說明文字，不是可編輯欄位，
-   所以做成緊貼在輸入框右側的一塊，讓人一眼看出完整識別碼長什麼樣。 */
-.nsinput { display: flex; align-items: stretch; }
-.nsinput input { flex: 1; min-width: 0; border-right: none; }
-.nssuffix {
-  display: flex; align-items: center; padding: 0 14px;
-  font-family: var(--body); font-size: 14.5px; white-space: nowrap;
-  color: var(--muted); background: var(--paper-2);
-  border: 1px solid var(--line); border-left: none;
-}
 
 .rowactions { margin-top: 26px; padding-top: 22px; border-top: 1px solid var(--line); display: flex; gap: 10px; align-items: center; }
 .saved { font-size: 13px; color: var(--ok); opacity: 0; transition: opacity .3s ease; }

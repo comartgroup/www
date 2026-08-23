@@ -5,30 +5,27 @@
  * 所以這些動作一律經過本函式。呼叫者必須是 web_editors 裡 role='admin' 的帳號。
  *
  * ★ 本 Supabase 專案的 auth.users 由報價系統、CRM、KMS、CPF、內部 Portal 與官網共用。
- *   為了讓官網後台的登入憑證與其他系統完全脫鉤（2026-08-23 Woody 指示），
- *   官網編輯者一律使用官網專屬的識別碼命名空間 NAMESPACE（見下方常數）：
+ *   官網「不另外建立獨立帳號」（2026-08-23 Woody 決定）：同事用他原本的公司帳號登入後台。
+ *   因此要理解清楚兩件事是分開的：
  *
- *     - 這個網域不需要真的存在也不需要收信；帳號建立時直接標記 email_confirm，
- *       Supabase 不會寄出任何信件。密碼重設走本函式的 set_password。
- *     - 與 M365 的 @comart.com.tw 信箱永不衝突，在共用的 auth 名冊裡一眼看得出用途。
- *     - 因此不再提供「把其他系統的既有帳號加進白名單」這種做法——那會讓
- *       同一組帳號密碼同時開得了官網後台與 KMS。grant 只用於重新啟用
- *       已經存在的官網專屬帳號。
- *
- *   資料庫端另有觸發器 web_editors_namespace_guard 把同一條規則寫死，
- *   連手動 SQL insert 也繞不過去（見 docs/sql/web_schema_05_editor_isolation.sql）。
+ *     授權——由 web_editors 白名單控制。沒列在名單裡的人，就算密碼正確也寫不了
+ *            任何官網資料（RLS 的 is_web_editor()），連後台首頁都進不去（前端閘門）。
+ *     憑證——與其他系統共用。同一組密碼一旦外洩，官網後台與那些系統會一起受影響。
+ *            這是選擇共用帳號時接受的代價，不是疏漏。
  *
  * ★ 「移除使用者」只會把人從 web_editors 白名單移出（收回官網權限），
- *   不會刪除 auth.users。官網專屬帳號雖然理論上可以安全刪除，
- *   但刪除不可逆，這裡一律保留紀錄，需要徹底刪除時由 Woody 在 Dashboard 執行。
+ *   不會刪除 auth.users —— 那個帳號的 UUID 可能被其他系統參照，
+ *   刪掉會在別處造成孤兒資料，而且不會有任何錯誤訊息。
  *
  * 密碼原則（2026-08-23 Woody 指示）：至少 10 碼，須含大寫、小寫與符號。
- * 產生的臨時密碼一定符合；管理者若自行指定密碼，也會用同一套規則檢查。
+ *   本函式產生的密碼一定符合；管理者自行指定密碼時也會用同一套規則檢查。
+ *   ★ 但 grant（沿用其他系統的既有帳號）不會碰對方的密碼，
+ *     那組密碼是當初建立它的系統設的，本原則管不到。
  *
  * 動作：
  *   list            列出官網編輯者（含 auth 端的最後登入時間）
- *   create          建立官網專屬帳號並加入白名單，回傳一次性密碼
- *   grant           重新啟用既有的官網專屬帳號（不改密碼）
+ *   create          建立新帳號並加入白名單，回傳一次性密碼
+ *   grant           把既有帳號加入白名單（帳號已存在於其他系統時用這個，不改密碼）
  *   set_password    重設某人的密碼，回傳一次性密碼
  *   revoke          從白名單移除（不刪除 auth 帳號）
  *
@@ -37,9 +34,6 @@
  */
 
 const ROLES = ["admin", "editor", "product", "publisher"];
-
-/** 官網專屬帳號的識別碼命名空間。改這裡就能換成別的形式（例如 ".web@comart.com.tw"）。 */
-const NAMESPACE = "@web.comart.com.tw";
 
 /* ---------- 密碼：至少 10 碼，須含大寫、小寫與符號 ---------- */
 
@@ -90,18 +84,6 @@ function passwordProblem(pw: string): string | null {
   if (!/[A-Z]/.test(pw)) return "密碼必須包含大寫英文字母";
   if (!/[a-z]/.test(pw)) return "密碼必須包含小寫英文字母";
   if (!/[^A-Za-z0-9]/.test(pw)) return "密碼必須包含符號";
-  return null;
-}
-
-/** 官網專屬帳號才准進白名單。合格回傳 null，否則回傳給人看的原因。 */
-function namespaceProblem(email: string): string | null {
-  if (!email.endsWith(NAMESPACE)) {
-    const local = email.split("@")[0];
-    return `官網後台使用官網專屬帳號，識別碼結尾必須是 ${NAMESPACE}。` +
-           (local ? `這個帳號請改成 ${local}${NAMESPACE}。` : "") +
-           "沿用其他系統的帳號會讓同一組密碼同時開得了官網後台與那個系統。";
-  }
-  if (email.length <= NAMESPACE.length) return "請填寫帳號名稱";
   return null;
 }
 
@@ -223,10 +205,6 @@ Deno.serve(async (req) => {
   if (action === "create") {
     if (!email) return json({ error: "email is required" }, 422, origin);
 
-    // 官網專屬命名空間：這是「與其他系統脫鉤」的實際執行點
-    const nsBad = namespaceProblem(email);
-    if (nsBad) return json({ error: "namespace", message: nsBad }, 422, origin);
-
     // 管理者可以自帶密碼；沒帶就產生一組符合原則的
     let password: string;
     if (payload.password) {
@@ -244,13 +222,14 @@ Deno.serve(async (req) => {
 
     if (!created.ok) {
       const detail = await created.text();
-      // 官網專屬帳號已存在，代表以前建過又被移出白名單——用 grant 重新啟用即可
+      // 帳號已存在是常見情形——本專案的使用者名冊多系統共用，請對方改用 grant
       if (created.status === 422 || detail.includes("already been registered")) {
         return json({
           error: "already_exists",
-          message: `${email} 這個官網專屬帳號已經存在（可能之前建過後被移出編輯名單）。` +
-                   "請改按「重新啟用」把他加回名單，密碼不會變動；" +
-                   "若對方不記得密碼，加回名單後再按「重設密碼」。",
+          message: `${email} 已經有帳號了。本專案的使用者名冊由官網、報價系統、CRM、KMS、` +
+                   "CPF 與內部 Portal 共用，這個 email 可能是其中任一系統建立的。" +
+                   "請改按「加入既有帳號」——那只會把他加進官網編輯名單，" +
+                   "不會變更他原有的密碼。",
         }, 409, origin);
       }
       console.error("[admin-users] 建立帳號失敗", created.status, detail);
@@ -275,11 +254,6 @@ Deno.serve(async (req) => {
   if (action === "grant") {
     if (!email) return json({ error: "email is required" }, 422, origin);
 
-    // grant 只用於「重新啟用既有的官網專屬帳號」。
-    // 刻意不允許把其他系統的帳號加進白名單——那正是要脫鉤的東西。
-    const nsBad = namespaceProblem(email);
-    if (nsBad) return json({ error: "namespace", message: nsBad }, 422, origin);
-
     const au = await svc(`/auth/v1/admin/users?per_page=200`);
     if (!au.ok) return json({ error: "Could not look up accounts" }, 502, origin);
     const found = ((await au.json()).users ?? [])
@@ -288,7 +262,7 @@ Deno.serve(async (req) => {
     if (!found) {
       return json({
         error: "not_found",
-        message: `沒有 ${email} 這個官網專屬帳號。請改按「建立官網帳號」。`,
+        message: `本專案的使用者名冊裡沒有 ${email}。請改按「建立新帳號」。`,
       }, 404, origin);
     }
 
