@@ -38,6 +38,9 @@
  *   程式不需要改。
  */
 const NOTIFY_TO   = Deno.env.get("WEB_NOTIFY_TO")   ?? "woody@comart.com.tw";
+
+/** Graph 寄信時的寄件信箱，必須是 M365 裡真實存在的信箱 */
+const SENDER      = Deno.env.get("WEB_SENDER")      ?? "sales@comart.com.tw";
 const NOTIFY_FROM = Deno.env.get("WEB_NOTIFY_FROM") ?? "COMART Website <onboarding@resend.dev>";
 
 const ALLOWED_ORIGINS = [
@@ -101,14 +104,23 @@ function validate(input: Record<string, unknown>) {
   return { errors, clean };
 }
 
-async function notify(row: Record<string, string>) {
-  const key = Deno.env.get("RESEND_API_KEY");
-  if (!key) {
-    console.log("[enquiry] RESEND_API_KEY 未設定，略過通知信，資料已寫入");
-    return { sent: false, reason: "no_key" };
-  }
-  console.log("[enquiry] 通知信 " + NOTIFY_FROM + " → " + NOTIFY_TO);
+/**
+ * 寄送通知信。
+ *
+ * 優先使用 Microsoft 365（Graph API）：
+ *   comart.com.tw 的郵件本來就在 M365，寄件網域即自身，
+ *   SPF（include:spf.protection.outlook.com -all）、DKIM（selector1/2）與
+ *   DMARC（p=quarantine）全部現成有效，不需要新增任何 DNS 記錄，
+ *   也不會進垃圾桶。寄件者是真正的 sales@comart.com.tw。
+ *
+ * 需要的 secrets：
+ *   MS_TENANT_ID / MS_CLIENT_ID / MS_CLIENT_SECRET
+ *   Azure 應用程式需具備「應用程式權限」Mail.Send 並已授與管理員同意。
+ *
+ * 若三者未設定，退回 Resend（RESEND_API_KEY）。兩者皆無則只寫入資料庫。
+ */
 
+function body(row: Record<string, string>) {
   const lines = [
     ["Company", row.company],
     ["Contact", row.contact],
@@ -124,8 +136,77 @@ async function notify(row: Record<string, string>) {
   ].filter(([, v]) => v)
    .map(([k, v]) => `${k}: ${v}`)
    .join("\n");
+  return `New enquiry from the COMART website\n\n${lines}\n\nProject summary:\n${row.summary}\n`;
+}
 
-  const text = `New enquiry from the COMART website\n\n${lines}\n\nProject summary:\n${row.summary}\n`;
+function subject(row: Record<string, string>) {
+  return `[Website enquiry] ${row.company} — ${row.country}`;
+}
+
+/** Graph 需要先用 client credentials 換 token。
+    失敗時把 Azure 的 AADSTS 代碼帶回來——那是診斷的關鍵，
+    且只是錯誤識別碼，不含任何憑證內容。 */
+async function graphToken(tenant: string, id: string, secret: string) {
+  const res = await fetch(`https://login.microsoftonline.com/${tenant}/oauth2/v2.0/token`, {
+    method: "POST",
+    headers: { "content-type": "application/x-www-form-urlencoded" },
+    body: new URLSearchParams({
+      client_id: id,
+      client_secret: secret,
+      scope: "https://graph.microsoft.com/.default",
+      grant_type: "client_credentials",
+    }),
+  });
+  if (!res.ok) {
+    const detail = await res.text();
+    console.error("[enquiry] Graph 取 token 失敗", res.status, detail.slice(0, 400));
+    const code = (detail.match(/AADSTS\d+/) || [])[0] || ("http_" + res.status);
+    return { error: code, detail: detail.slice(0, 400) };
+  }
+  return { token: (await res.json()).access_token as string };
+}
+
+async function sendViaGraph(row: Record<string, string>) {
+  const tenant = Deno.env.get("MS_TENANT_ID");
+  const id = Deno.env.get("MS_CLIENT_ID");
+  const secret = Deno.env.get("MS_CLIENT_SECRET");
+  if (!tenant || !id || !secret) return null;          // 未設定 → 交給後備
+
+  const auth = await graphToken(tenant, id, secret);
+  if (!auth.token) {
+    return { sent: false, reason: "graph_token:" + auth.error, detail: auth.detail };
+  }
+  const token = auth.token;
+
+  // 以 SENDER 這個信箱的身分寄出；收件人與回覆對象分開設定
+  const res = await fetch(
+    `https://graph.microsoft.com/v1.0/users/${encodeURIComponent(SENDER)}/sendMail`,
+    {
+      method: "POST",
+      headers: { authorization: `Bearer ${token}`, "content-type": "application/json" },
+      body: JSON.stringify({
+        message: {
+          subject: subject(row),
+          body: { contentType: "Text", content: body(row) },
+          toRecipients: [{ emailAddress: { address: NOTIFY_TO } }],
+          replyTo: [{ emailAddress: { address: row.email } }],
+        },
+        saveToSentItems: true,
+      }),
+    },
+  );
+
+  if (!res.ok) {
+    const detail = await res.text();
+    console.error("[enquiry] Graph 寄送失敗", res.status, detail.slice(0, 300));
+    return { sent: false, reason: `graph_${res.status}`, detail: detail.slice(0, 300) };
+  }
+  return { sent: true, via: "graph" };
+}
+
+async function sendViaResend(row: Record<string, string>) {
+  const key = Deno.env.get("RESEND_API_KEY");
+  if (!key) return null;
 
   const res = await fetch("https://api.resend.com/emails", {
     method: "POST",
@@ -134,18 +215,28 @@ async function notify(row: Record<string, string>) {
       from: NOTIFY_FROM,
       to: [NOTIFY_TO],
       reply_to: row.email,
-      subject: `[Website enquiry] ${row.company} — ${row.country}`,
-      text,
+      subject: subject(row),
+      text: body(row),
     }),
   });
 
   if (!res.ok) {
     const detail = await res.text();
-    console.error("[enquiry] 通知信寄送失敗", res.status, detail);
-    // 資料已經寫入，寄信失敗不影響客戶那端；把原因留在 log 供排查
+    console.error("[enquiry] Resend 寄送失敗", res.status, detail);
     return { sent: false, reason: `http_${res.status}`, detail: detail.slice(0, 300) };
   }
-  return { sent: true };
+  return { sent: true, via: "resend" };
+}
+
+async function notify(row: Record<string, string>) {
+  const graph = await sendViaGraph(row);
+  if (graph) return graph;                              // 已設定 Graph 就用它，不再退回
+
+  const resend = await sendViaResend(row);
+  if (resend) return resend;
+
+  console.log("[enquiry] 未設定任何寄信服務，略過通知信，資料已寫入");
+  return { sent: false, reason: "no_mailer" };
 }
 
 Deno.serve(async (req) => {
