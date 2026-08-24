@@ -4,9 +4,10 @@
  * 建立帳號、設定密碼、刪除帳號都需要 service_role 權限，那把 key 絕對不能出現在
  * 前端，所以這些動作一律經過本函式。呼叫者必須是 web_editors 裡 role='admin' 的帳號。
  *
- * 密碼原則（2026-08-23 Woody 指示）：至少 10 碼，須含大寫、小寫與符號。
+ * 密碼原則（2026-08-24 Woody 指示）：至少 10 碼 + 禁用常見密碼。
+ *   不再要求大小寫與符號——組成規則會把人逼向可預測的形狀。詳見下方註解。
  *   密碼由管理者自行輸入，本函式不產生密碼——產生的密碼還是得口頭轉達，
- *   等於多一道手續而沒有多一分安全。這裡負責的是「擋掉不符原則的密碼」。
+ *   等於多一道手續而沒有多一分安全。這裡負責的是「擋掉不該用的密碼」。
  *
  * ★ 使用者名冊的實際範圍（2026-08-23 實地查證後更正）：
  *   平台各系統（報價、CRM、KMS、CPF、內部 Portal）**不使用** Supabase auth，
@@ -64,14 +65,150 @@ function svc(path: string, init?: RequestInit) {
   });
 }
 
-/** 至少 10 碼，須含大寫、小寫與符號。回傳問題描述，或 null 表示通過。 */
-function passwordProblem(pw: unknown): string | null {
+/* =========================================================
+   密碼原則（2026-08-24 Woody 指示）：至少 10 碼 + 禁用常見密碼。
+
+   刻意不再要求「大寫 + 小寫 + 符號」。組成規則會把人逼向可預測的形狀——
+   Password1!、Comart@2026 全都通過組成檢查，卻是攻擊者最先猜的那批。
+   NIST SP 800-63B 的建議是改用「長度 + 黑名單」，這裡照做。
+
+   三道檢查，由便宜到昂貴：
+     1. 長度
+     2. 本地樣式比對（常見密碼、鍵盤序列、重複字元、公司／帳號相關字）
+     3. Have I Been Pwned 的 Pwned Passwords 範圍查詢
+
+   第 3 道用 k-anonymity：只送出 SHA-1 的前 5 碼，比對在本地做，
+   密碼本身與完整雜湊都不會離開這台機器。查不通時放行（只擋前兩道），
+   因為讓管理者完全無法設定密碼，比放行一個網路暫時查不到的密碼更糟。
+   ========================================================= */
+
+/** 實際外洩清單裡最常出現的那批。HIBP 涵蓋得更全，這份是離線時的下限。 */
+const COMMON_PASSWORDS = new Set([
+  "password", "passwort", "passord", "senha", "contrasena", "motdepasse",
+  "qwerty", "qwertyuiop", "azerty", "qazwsx", "zxcvbnm", "asdfghjkl",
+  "letmein", "welcome", "admin", "administrator", "root", "guest", "user",
+  "login", "pass", "secret", "changeme", "default", "temp", "test", "demo",
+  "iloveyou", "princess", "sunshine", "monkey", "dragon", "football",
+  "baseball", "basketball", "superman", "batman", "pokemon", "starwars",
+  "trustno", "whatever", "freedom", "shadow", "master", "michael",
+  "jennifer", "jordan", "harley", "ranger", "hunter", "buster", "thomas",
+  "robert", "soccer", "hockey", "killer", "george", "andrew", "charlie",
+  "daniel", "matthew", "joshua", "michelle", "jessica", "ashley",
+  "abc", "abcd", "abcdef", "abcdefg", "abcdefgh", "abcabc",
+  "aaaaaa", "iloveu", "lovely", "chocolate", "cookie", "flower", "summer",
+  "winter", "spring", "autumn", "january", "december", "money", "office",
+  "computer", "internet", "samsung", "google", "facebook", "apple",
+  "taiwan", "taipei", "vietnam", "hanoi", "china", "shenzhen", "dongguan",
+  "comart", "comartgroup", "company", "business", "sales", "manager",
+  "wang", "chen", "liu", "huang", "woody",
+  "woaini", "womenzaiyiqi", "wanmeishijie", "taijiquan", "shanghai",
+  "beijing", "zhonghua", "nihao"
+]);
+
+/** 常見的字元替換折回原字，讓 P@ssw0rd 與 password 視為同一個。 */
+const LEET: Record<string, string> = {
+  "0": "o", "1": "i", "3": "e", "4": "a", "5": "s", "7": "t", "8": "b",
+  "@": "a", "$": "s", "!": "i", "|": "i", "+": "t", "(": "c",
+};
+
+/** 折成比對用的形式：小寫、還原字元替換、只留字母。 */
+function fold(pw: string): string {
+  return pw.toLowerCase()
+    .split("").map((c) => LEET[c] ?? c).join("")
+    .replace(/[^a-z]/g, "");
+}
+
+/**
+ * 產生所有要拿去比對黑名單的候選形式。
+ *
+ * 為什麼需要多個：LEET 會把 "!" 折成 "i"，所以 "P@ssw0rd!!" 直接 fold
+ * 會得到 "passwordii" 而比對不到 "password"。頭尾的裝飾字元要先剝掉再折。
+ */
+function foldCandidates(pw: string): string[] {
+  const low = pw.toLowerCase();
+  const trimmed = low.replace(/^[^a-z0-9]+/, "").replace(/[^a-z0-9]+$/, "");
+  return [
+    fold(low),
+    fold(trimmed),                            // 去頭尾符號："p@ssw0rd" → password
+    fold(trimmed.replace(/\d+$/, "")),        // 再去尾端數字："password2026" → password
+    fold(low.replace(/[^a-z]/g, "")),          // 只留字母，不做替換
+  ].filter(Boolean);
+}
+
+/** 鍵盤序列或連續字元，例如 1234567890、qwertyuiop、aaaaaaaaaa */
+function isSequential(pw: string): boolean {
+  const low = pw.toLowerCase();
+  if (/^(.)\1+$/.test(low)) return true;                 // 全部同一個字元
+  const runs = ["abcdefghijklmnopqrstuvwxyz",
+                "0123456789", "1234567890",   // 數值順序與鍵盤數字列是兩回事
+                "qwertyuiop", "asdfghjkl", "zxcvbnm"];
+  for (const run of runs) {
+    const rev = run.split("").reverse().join("");
+    // 密碼整體就是某條序列的一段（含反向）才算，避免誤殺內含 abc 的長密碼
+    if (run.includes(low) || rev.includes(low)) return true;
+  }
+  return false;
+}
+
+/**
+ * 密碼原則檢查。回傳問題描述，或 null 表示通過。
+ * email 用來擋「密碼裡就寫著自己的帳號」，可省略。
+ */
+async function passwordProblem(pw: unknown, email?: string): Promise<string | null> {
   if (typeof pw !== "string" || !pw) return "請輸入密碼";
   if (pw.length < 10) return "密碼至少 10 碼";
-  if (!/[A-Z]/.test(pw)) return "密碼需包含大寫字母";
-  if (!/[a-z]/.test(pw)) return "密碼需包含小寫字母";
-  if (!/[^A-Za-z0-9]/.test(pw)) return "密碼需包含符號";
+
+  for (const cand of foldCandidates(pw)) {
+    if (COMMON_PASSWORDS.has(cand)) return "這是常見密碼，請換一個";
+  }
+
+  if (isSequential(pw)) return "不能使用連續字元或鍵盤序列";
+
+  // 公司名與帳號名不該出現在密碼裡——那是攻擊者第一個會試的字典
+  if (/comart/i.test(pw)) return "密碼不能包含公司名稱";
+  const local = (email ?? "").split("@")[0].toLowerCase();
+  if (local.length >= 3 && pw.toLowerCase().includes(local)) {
+    return "密碼不能包含自己的帳號名稱";
+  }
+
+  const pwned = await pwnedCount(pw);
+  if (pwned > 0) {
+    return `這組密碼曾在外洩資料中出現 ${pwned.toLocaleString("en-US")} 次，請換一個`;
+  }
   return null;
+}
+
+/**
+ * 查 Have I Been Pwned 的 Pwned Passwords。回傳出現次數，0 表示沒查到。
+ *
+ * k-anonymity：只送 SHA-1 的前 5 碼，對方回傳該前綴下的所有後綴與次數，
+ * 比對在本地做。密碼與完整雜湊都不會送出去。
+ * 查詢失敗回 0（放行）——網路問題不該讓管理者無法設定密碼。
+ */
+async function pwnedCount(pw: string): Promise<number> {
+  try {
+    const bytes = new Uint8Array(
+      await crypto.subtle.digest("SHA-1", new TextEncoder().encode(pw)),
+    );
+    const hash = Array.from(bytes)
+      .map((b) => b.toString(16).padStart(2, "0")).join("").toUpperCase();
+    const prefix = hash.slice(0, 5), suffix = hash.slice(5);
+
+    const res = await fetch(`https://api.pwnedpasswords.com/range/${prefix}`, {
+      headers: { "Add-Padding": "true" },   // 回應長度固定，連流量大小都不洩漏
+      signal: AbortSignal.timeout(4000),
+    });
+    if (!res.ok) return 0;
+
+    for (const line of (await res.text()).split("\n")) {
+      const [suf, count] = line.trim().split(":");
+      if (suf === suffix) return parseInt(count, 10) || 0;
+    }
+    return 0;
+  } catch (err) {
+    console.error("[admin-users] Pwned Passwords 查詢失敗，僅套用本地檢查", err);
+    return 0;
+  }
 }
 
 /** 確認呼叫者是官網 admin。回傳呼叫者的 uid。 */
@@ -159,7 +296,7 @@ Deno.serve(async (req) => {
   if (action === "create") {
     if (!email) return json({ error: "請輸入 Email" }, 422, origin);
 
-    const pwBad = passwordProblem(payload.password);
+    const pwBad = await passwordProblem(payload.password, email);
     if (pwBad) return json({ error: "weak_password", message: pwBad }, 422, origin);
 
     let userId: string | null = null;
@@ -204,7 +341,11 @@ Deno.serve(async (req) => {
   if (action === "set_password") {
     if (!payload.user_id) return json({ error: "user_id is required" }, 422, origin);
 
-    const pwBad = passwordProblem(payload.password);
+    // 查出這個帳號的 email，才能擋「密碼裡就寫著自己的帳號」
+    const who = await svc(`/auth/v1/admin/users/${payload.user_id}`);
+    const whoEmail = who.ok ? ((await who.json()).email ?? "") : "";
+
+    const pwBad = await passwordProblem(payload.password, whoEmail);
     if (pwBad) return json({ error: "weak_password", message: pwBad }, 422, origin);
 
     const res = await svc(`/auth/v1/admin/users/${payload.user_id}`, {

@@ -164,16 +164,101 @@
     ["publisher", "發布者 — 可切換上線狀態"]
   ];
 
-  var PW_HINT = "至少 10 碼，須含大寫、小寫與符號。";
+  var PW_HINT = "至少 10 碼，不能是常見密碼。長一點的普通句子比夾符號的短密碼更安全。";
 
-  /** 密碼原則檢查。與 Edge Function 的 passwordProblem 同一套規則；
-      這裡只是讓使用者少跑一趟，真正的關卡在伺服器端。 */
-  function pwProblem(pw) {
+  /* ---------------------------------------------------------
+     密碼原則（2026-08-24）：長度 + 黑名單，不要求大小寫與符號。
+     組成規則會把人逼向 Password1! 這種可預測的形狀——那正是
+     攻擊者最先猜的一批。詳見 supabase/functions/admin-users/index.ts。
+
+     ★ 以下規則是從該 Edge Function 抄過來的，兩邊必須一致。
+       這裡只是讓使用者少跑一趟；真正的關卡在伺服器端，
+       而且伺服器端多一道 Have I Been Pwned 查詢（前端不做，
+       不想在每次按鍵時發外部請求）。所以前端說「符合原則」之後
+       仍可能被伺服器擋下，那時會顯示伺服器回傳的具體理由。
+     --------------------------------------------------------- */
+  /** 實際外洩清單裡最常出現的那批。HIBP 涵蓋得更全，這份是離線時的下限。 */
+  var COMMON_PASSWORDS = new Set([
+    "password", "passwort", "passord", "senha", "contrasena", "motdepasse",
+    "qwerty", "qwertyuiop", "azerty", "qazwsx", "zxcvbnm", "asdfghjkl",
+    "letmein", "welcome", "admin", "administrator", "root", "guest", "user",
+    "login", "pass", "secret", "changeme", "default", "temp", "test", "demo",
+    "iloveyou", "princess", "sunshine", "monkey", "dragon", "football",
+    "baseball", "basketball", "superman", "batman", "pokemon", "starwars",
+    "trustno", "whatever", "freedom", "shadow", "master", "michael",
+    "jennifer", "jordan", "harley", "ranger", "hunter", "buster", "thomas",
+    "robert", "soccer", "hockey", "killer", "george", "andrew", "charlie",
+    "daniel", "matthew", "joshua", "michelle", "jessica", "ashley",
+    "abc", "abcd", "abcdef", "abcdefg", "abcdefgh", "abcabc",
+    "aaaaaa", "iloveu", "lovely", "chocolate", "cookie", "flower", "summer",
+    "winter", "spring", "autumn", "january", "december", "money", "office",
+    "computer", "internet", "samsung", "google", "facebook", "apple",
+    "taiwan", "taipei", "vietnam", "hanoi", "china", "shenzhen", "dongguan",
+    "comart", "comartgroup", "company", "business", "sales", "manager",
+    "wang", "chen", "liu", "huang", "woody",
+    "woaini", "womenzaiyiqi", "wanmeishijie", "taijiquan", "shanghai",
+    "beijing", "zhonghua", "nihao"
+  ]);
+
+  /** 常見的字元替換折回原字，讓 P@ssw0rd 與 password 視為同一個。 */
+  var LEET = {
+    "0": "o", "1": "i", "3": "e", "4": "a", "5": "s", "7": "t", "8": "b",
+    "@": "a", "$": "s", "!": "i", "|": "i", "+": "t", "(": "c",
+  };
+
+  /** 折成比對用的形式：小寫、還原字元替換、只留字母。 */
+  function fold(pw) {
+    return pw.toLowerCase()
+      .split("").map((c) => LEET[c] ?? c).join("")
+      .replace(/[^a-z]/g, "");
+  }
+
+  /**
+   * 產生所有要拿去比對黑名單的候選形式。
+   *
+   * 為什麼需要多個：LEET 會把 "!" 折成 "i"，所以 "P@ssw0rd!!" 直接 fold
+   * 會得到 "passwordii" 而比對不到 "password"。頭尾的裝飾字元要先剝掉再折。
+   */
+  function foldCandidates(pw) {
+    var low = pw.toLowerCase();
+    var trimmed = low.replace(/^[^a-z0-9]+/, "").replace(/[^a-z0-9]+$/, "");
+    return [
+      fold(low),
+      fold(trimmed),                            // 去頭尾符號："p@ssw0rd" → password
+      fold(trimmed.replace(/\d+$/, "")),        // 再去尾端數字："password2026" → password
+      fold(low.replace(/[^a-z]/g, "")),          // 只留字母，不做替換
+    ].filter(Boolean);
+  }
+
+  /** 鍵盤序列或連續字元，例如 1234567890、qwertyuiop、aaaaaaaaaa */
+  function isSequential(pw) {
+    var low = pw.toLowerCase();
+    if (/^(.)\1+$/.test(low)) return true;                 // 全部同一個字元
+    var runs = ["abcdefghijklmnopqrstuvwxyz",
+                  "0123456789", "1234567890",   // 數值順序與鍵盤數字列是兩回事
+                  "qwertyuiop", "asdfghjkl", "zxcvbnm"];
+    for (var i = 0; i < runs.length; i++) {
+      var rev = runs[i].split("").reverse().join("");
+      // 密碼整體就是某條序列的一段（含反向）才算，避免誤殺內含 abc 的長密碼
+      if (runs[i].includes(low) || rev.includes(low)) return true;
+    }
+    return false;
+  }
+
+  /** 密碼原則檢查（本地部分）。回傳問題描述，或 null 表示通過。 */
+  function pwProblem(pw, email) {
     if (!pw) return "請輸入密碼";
     if (pw.length < 10) return "密碼至少 10 碼";
-    if (!/[A-Z]/.test(pw)) return "密碼需包含大寫字母";
-    if (!/[a-z]/.test(pw)) return "密碼需包含小寫字母";
-    if (!/[^A-Za-z0-9]/.test(pw)) return "密碼需包含符號";
+    var cands = foldCandidates(pw);
+    for (var i = 0; i < cands.length; i++) {
+      if (COMMON_PASSWORDS.has(cands[i])) return "這是常見密碼，請換一個";
+    }
+    if (isSequential(pw)) return "不能使用連續字元或鍵盤序列";
+    if (/comart/i.test(pw)) return "密碼不能包含公司名稱";
+    var local = String(email || "").split("@")[0].toLowerCase();
+    if (local.length >= 3 && pw.toLowerCase().indexOf(local) !== -1) {
+      return "密碼不能包含自己的帳號名稱";
+    }
     return null;
   }
 
@@ -189,7 +274,7 @@
   }
 
   /** 綁定顯示切換與即時檢查 */
-  function wirePwField(root, id) {
+  function wirePwField(root, id, emailOf) {
     var input = $("#" + id, root);
     var hint = $("#" + id + "Hint", root);
     var btn = root.querySelector('[data-reveal="' + id + '"]');
@@ -200,7 +285,7 @@
     };
     input.addEventListener("input", function () {
       if (!input.value) { hint.textContent = PW_HINT; hint.className = "hint"; return; }
-      var bad = pwProblem(input.value);
+      var bad = pwProblem(input.value, emailOf ? emailOf() : "");
       hint.textContent = bad || "符合原則";
       hint.className = bad ? "hint is-bad" : "hint is-ok";
     });
@@ -229,12 +314,12 @@
       '<span class="saved" id="nuState"></span></div></div></div>';
     host.scrollIntoView({ behavior: "smooth", block: "start" });
 
-    var pw = wirePwField(host, "nuPw");
+    var pw = wirePwField(host, "nuPw", function () { return $("#nuEmail", host).value; });
 
     $("#nuCreate").onclick = function () {
       var email = $("#nuEmail").value.trim().toLowerCase();
       if (!email || email.indexOf("@") < 1) { flash($("#nuState"), "Email 格式看起來不對"); return; }
-      var bad = pwProblem(pw.value);
+      var bad = pwProblem(pw.value, $("#nuEmail", host).value);
       if (bad) { flash($("#nuState"), bad); pw.focus(); return; }
 
       var btn = this; btn.disabled = true;
@@ -264,11 +349,11 @@
       '<span class="saved" id="spState"></span></div></div></div>';
     host.scrollIntoView({ behavior: "smooth", block: "start" });
 
-    var pw = wirePwField(host, "spPw");
+    var pw = wirePwField(host, "spPw", function () { return email; });
     $("#spCancel").onclick = function () { host.innerHTML = ""; };
 
     $("#spSave").onclick = function () {
-      var bad = pwProblem(pw.value);
+      var bad = pwProblem(pw.value, email);
       if (bad) { flash($("#spState"), bad); pw.focus(); return; }
       var btn = this; btn.disabled = true;
       SB.fn.users("set_password", { user_id: userId, password: pw.value })
@@ -548,8 +633,12 @@
           "KMS、報價系統、CRM、CPF 與內部 Portal 是用工號登入、密碼另存一套，" +
           "與這裡完全獨立。在這裡設定或更改密碼<b>不會影響那些系統</b>，反之亦然。</div>" +
           '<div class="note"><b>密碼由你設定並自行轉達。</b>' +
-          "系統沒有寄信通知的機制，新增使用者或更改密碼都不會通知對方。" +
-          "原則是至少 10 碼、含大寫、小寫與符號。</div>" +
+          "系統沒有寄信通知的機制，新增使用者或更改密碼都不會通知對方。</div>" +
+          '<div class="note"><b>密碼原則：至少 10 碼，且不能是常見密碼。</b>' +
+          "刻意不要求大小寫與符號——那類規則會把人逼向 Password1! 這種可預測的形狀，" +
+          "而那正是攻擊者最先猜的一批。送出時會比對 Have I Been Pwned 的外洩密碼庫，" +
+          "只送出雜湊值的前 5 碼，密碼本身不會離開伺服器。" +
+          "建議用四五個不相干的字串成一句，例如較長的普通詞組，比短而複雜的好記也好防。</div>" +
           '<div class="note"><b>「刪除使用者」會移出編輯名單並刪除帳號。</b>' +
           "唯一例外是該帳號在 CPF 系統另有資料時——那種情況只收回官網權限、保留帳號本身，" +
           "避免影響 CPF 那邊的紀錄，畫面上會告知。</div>" +
