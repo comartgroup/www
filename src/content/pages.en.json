@@ -6,78 +6,78 @@
       "out": "index.html",
       "src": "home.html",
       "nav": null,
-      "title": "COMART — From Product Concept to Mass Production | ODM / OEM Partner",
-      "desc": "COMART is an ODM/OEM partner for consumer electronics and automotive accessory brands. One team covers product planning, design, mechanical and electronics engineering, tooling, plastic injection, assembly, testing and supply chain delivery across Taiwan, China and Vietnam."
+      "title": "Car Mount & Consumer Electronics ODM Manufacturer | COMART",
+      "desc": "Design-led Taiwan based ODM for car mounts, wireless charging, and consumer electronics. Plants in Vietnam and China for country-of-origin flexibility."
     },
     {
       "out": "services/index.html",
       "src": "services.html",
       "nav": "services",
-      "title": "Services — Six Stages from Concept to Mass Production | COMART",
-      "desc": "COMART's services are organised around your product development process: planning and design, mechanical and electronics engineering, prototyping and tooling, plastic injection, assembly and testing, and supply chain delivery."
+      "title": "ODM Services — Design to Mass Production | COMART",
+      "desc": "Six stages, one team: product planning, engineering, tooling, injection, assembly and delivery — concept through to mass production."
     },
     {
       "out": "services/product-planning-design/index.html",
       "src": "services-planning.html",
       "nav": "services",
-      "title": "Product Planning & Design | COMART Services",
-      "desc": "User scenario and product requirement definition, product planning, industrial design, preliminary material and process advice, target cost and volume feasibility."
+      "title": "Product Planning & Industrial Design | COMART ODM",
+      "desc": "Scenario and requirement definition, product planning, industrial design, material and process advice, target cost and volume feasibility."
     },
     {
       "out": "services/mechanical-electronics-engineering/index.html",
       "src": "services-engineering.html",
       "nav": "services",
-      "title": "Mechanical & Electronics Engineering | COMART Services",
-      "desc": "Mechanical design, material and structure selection, electronic system planning, circuit design, firmware development, test planning, and PCB/PCBA and certification partner management."
+      "title": "Mechanical & Electronics Engineering | COMART ODM",
+      "desc": "Mechanical design, structure and material selection, circuit design, firmware, test planning, and PCBA and certification partner management."
     },
     {
       "out": "services/prototyping-dfm-tooling/index.html",
       "src": "services-tooling.html",
       "nav": "services",
-      "title": "Prototyping, DFM & Tooling | COMART Services",
-      "desc": "Appearance and functional prototypes, DFM/DFMA review, mould design, mould flow, parting, gating and ejection planning, T1 trials and mould revision, acceptance and transfer to production."
+      "title": "Prototyping, DFM & Injection Tooling | COMART ODM",
+      "desc": "Appearance and functional prototypes, DFM review, mold design and mold flow, T1 trials and revision, acceptance and transfer to production."
     },
     {
       "out": "services/plastic-injection-manufacturing/index.html",
       "src": "services-injection.html",
       "nav": "services",
-      "title": "Plastic Injection & Manufacturing | COMART Services",
-      "desc": "Engineering plastics and elastomers, injection tonnage and part size range, two-shot and over-moulding, process stability and parameter management, pilot run and mass production."
+      "title": "Plastic Injection Manufacturing | COMART Vietnam & China",
+      "desc": "Engineering plastics and elastomers, two-shot and over-molding, process stability and parameter management, pilot run through to mass production."
     },
     {
       "out": "services/assembly-testing-quality/index.html",
       "src": "services-assembly.html",
       "nav": "services",
-      "title": "Assembly, Testing & Quality | COMART Services",
-      "desc": "Assembly and packaging, work instructions and process control, functional, reliability and environmental testing, quality inspection and records, third-party laboratory coordination."
+      "title": "Assembly, Testing & Quality Control | COMART ODM",
+      "desc": "Assembly and packaging, work instructions and process control, functional, reliability and environmental testing, third-party laboratory coordination."
     },
     {
       "out": "services/supply-chain-delivery/index.html",
       "src": "services-supply-chain.html",
       "nav": "services",
-      "title": "Supply Chain & Delivery | COMART Services",
-      "desc": "Material and sub-supplier management, production allocation between China and Vietnam, pilot run to mass production transfer, packaging and shipment coordination, delivery and quality project management."
+      "title": "Supply Chain & Delivery | COMART ODM Manufacturing",
+      "desc": "Material and sub-supplier management, production allocation between China and Vietnam, packaging, shipment coordination and delivery management."
     },
     {
       "out": "global-operations/index.html",
       "src": "global-operations.html",
       "nav": "operations",
-      "title": "Global Operations — One Team Across Taiwan, China and Vietnam | COMART",
-      "desc": "COMART operates as one team across Taiwan, China and Vietnam. We propose the production setup based on your product maturity, process, cost, lead time, country of origin and export requirements."
+      "title": "ODM Manufacturing in Vietnam, China & Taiwan | COMART",
+      "desc": "Bac Ninh and Dongguan plants under one Taiwan-managed team. Production allocated by cost, lead time, country of origin and export requirements."
     },
     {
       "out": "products/index.html",
       "src": "products.html",
       "nav": "products",
-      "title": "Products — Existing Products & Quick Customization | COMART",
-      "desc": "Two routes to your own product: our existing modular product library, which can be combined and adapted to your requirement, and quick customization of products already in production through logo, colour, appearance and packaging."
+      "title": "Car Mounts & Phone Holders for ODM Development | COMART",
+      "desc": "Modular car mounts, phone holders and stands, plus customization of products already in production. Typically from 1,000 pieces, depending on tooling."
     },
     {
       "out": "products/detail/index.html",
       "src": "product.html",
       "nav": "products",
-      "title": "Product Detail | COMART",
-      "desc": "Product specifications and features. COMART is an ODM/OEM partner for consumer electronics and automotive accessories.",
+      "title": "Product Specifications | COMART ODM Car Mounts",
+      "desc": "Specifications, materials and customization options for COMART car mounts, phone holders and wireless charging products.",
       "bodyclass": "solid-header",
       "sitemap": false
     },
@@ -85,43 +85,43 @@
       "out": "quality-compliance/index.html",
       "src": "quality-compliance.html",
       "nav": "quality",
-      "title": "Quality & Compliance | COMART",
-      "desc": "Control points from incoming material to outgoing shipment, reliability and environmental testing, third-party laboratory coordination, and group-level certifications including ISO 9001, ISO 14001, amfori BSCI, Sedex/SMETA and Apple MFi."
+      "title": "Quality & Compliance — ISO 9001, ISO 14001, MFi | COMART",
+      "desc": "IQC to OQC control points and reliability testing. ISO 9001 and ISO 14001 certified, Apple MFi licensed, with Walmart and Costco program experience."
     },
     {
       "out": "equipment/index.html",
       "src": "equipment.html",
       "nav": "equipment",
-      "title": "Equipment | COMART",
-      "desc": "COMART's manufacturing, tooling, assembly and testing equipment across our China and Vietnam operations."
+      "title": "Injection & Tooling Equipment List | COMART ODM",
+      "desc": "Injection machines, tooling, assembly and testing equipment at our Bac Ninh and Dongguan plants, stated at the level your engineers need."
     },
     {
       "out": "company/index.html",
       "src": "company.html",
       "nav": "company",
-      "title": "Company — About COMART, Vision and Milestones | COMART",
-      "desc": "COMART has been developing and manufacturing consumer electronics and automotive accessories since 1994, with over 200 employees and more than 100 patents granted to date."
+      "title": "About COMART — Taiwan ODM Manufacturer Since 1994",
+      "desc": "Developing and manufacturing phone mounts, car accessories and consumer electronics since 1994. Over 200 employees and more than 100 patents granted."
     },
     {
       "out": "news/index.html",
       "src": "news.html",
       "nav": "news",
-      "title": "News — Exhibitions, Capability and Certification Updates | COMART",
-      "desc": "COMART company news: exhibitions and trade shows, company development, certification updates, new equipment and capacity, and new product releases."
+      "title": "News & Exhibitions | COMART ODM Manufacturer",
+      "desc": "COMART exhibitions and trade shows, capability and capacity updates, certification news, and new product releases."
     },
     {
       "out": "start-your-project/index.html",
       "src": "start-your-project.html",
       "nav": null,
-      "title": "Start Your Project | COMART",
-      "desc": "Tell us where your product stands today. Send us your product stage, application, target market and volume expectation, and we will come back with a development route and the right people from our team."
+      "title": "Start an ODM Project with COMART | Get a Development Route",
+      "desc": "Tell us your product stage, application, target market and volume. We reply with a development route and the right engineers — no drawings needed yet."
     },
     {
       "out": "inquiry/index.html",
       "src": "inquiry.html",
       "nav": null,
-      "title": "Inquiry | COMART",
-      "desc": "Start a project with COMART, or email our sales team directly. Choose whichever suits how far your product has progressed."
+      "title": "Contact COMART — ODM & OEM Enquiries | Taiwan",
+      "desc": "Start a project or email our sales team directly. Choose whichever suits how far your product has progressed. NDA available before technical data."
     }
   ]
 }
