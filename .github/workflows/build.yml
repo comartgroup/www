@@ -1,0 +1,55 @@
+# Rebuilds the site whenever anything in src/ changes.
+#
+# Where this file must live in the repo:
+#     .github/workflows/build.yml
+#
+# What it does: runs build.py (the same command the developer runs by hand),
+# then commits the regenerated pages back to main. GitHub Pages picks them up
+# from there. No dependencies to install — build.py uses only the Python
+# standard library.
+
+name: Build site
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - 'src/**'
+      - 'build.py'
+  workflow_dispatch:        # lets you run it manually from the Actions tab
+
+permissions:
+  contents: write           # required so the workflow can commit the output
+
+concurrency:
+  group: build-site         # never let two builds commit at the same time
+  cancel-in-progress: false
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check out the repository
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+
+      - name: Run the static generator
+        run: python3 build.py
+
+      - name: Commit the regenerated pages
+        run: |
+          git config user.name  "comart-build[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+
+          if [ -z "$(git status --porcelain)" ]; then
+            echo "Source changed but the output is identical — nothing to commit."
+            exit 0
+          fi
+
+          git add -A
+          git commit -m "build: regenerate site from src/"
+          git push
