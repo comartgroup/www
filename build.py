@@ -34,7 +34,7 @@ import sys
 BASE = os.path.dirname(os.path.abspath(__file__))
 SRC = os.path.join(BASE, 'src')
 
-SITE_URL = 'https://comartgroup.github.io/www/'
+SITE_URL = 'https://www.comart.com.tw/'
 
 # code = <html lang> 與檔名用的代碼；dir = 輸出目錄前綴；label = 語言切換鈕文字
 LANGS = [
@@ -162,6 +162,10 @@ def render(page, lang, layout, header, footer, ui):
     html = html.replace('{{LANG}}', lang['code'])
     html = html.replace('{{BODYCLASS}}', page.get('bodyclass', ''))
     html = html.replace('{{PATH}}', lang['dir'] + page_path(page['out']))
+    # canonical 用的絕對網址。曾經寫死在 layout.html 裡，造成改了 SITE_URL
+    # 卻只有 hreflang 跟著動、canonical 仍指向舊站——等於告訴搜尋引擎舊網址才是正本。
+    # 事實來源只能有一個，就是 SITE_URL。
+    html = html.replace('{{SITEURL}}', SITE_URL)
     html = html.replace('{{BASE}}', root + lang['dir'])   # 站內頁面連結（含語言目錄）
     html = html.replace('{{ROOT}}', root)                 # 資產路徑（三語共用）
     html = html.replace('{{LANGDIR}}', lang['dir'])
@@ -251,8 +255,7 @@ def main():
 
     write(os.path.join(BASE, 'sitemap.xml'), build_sitemap(sitemap_entries))
     # robots.txt 只有放在「網域根目錄」才會被爬蟲讀取。
-    # 目前站台在 comartgroup.github.io/www/ 子路徑下，這份是無效的；
-    # 切換到 www.comart.com.tw（站台位於根目錄）之後才會開始生效。
+    # 站台自 2026-10-09 起位於 www.comart.com.tw 的根目錄，所以這份是有效的。
     #
     # ★ 不要把 /webadmin/ 之類的路徑寫進 Disallow。
     #   robots.txt 必須公開可讀才能運作，寫進去等於主動公告後台位置。
