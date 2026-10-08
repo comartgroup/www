@@ -410,7 +410,9 @@ section[id] { scroll-margin-top: calc(var(--header-h) + 8px); }
 .cert-note { margin-top: 20px; font-size: 13px; color: rgba(255,255,255,.5); line-height: 1.6; }
 .cert-note a { color: rgba(255,255,255,.82); text-decoration: underline; text-underline-offset: 3px; text-decoration-thickness: 1px; }
 .cert-note a:hover { color: #fff; }
-.qc-figure img { width: 100%; height: 100%; object-fit: cover; max-height: 460px; }
+/* 460px 會把量測機的上半截（含 DL-4030 的機身標示）切掉。
+   這一欄在桌機實際有 688px 高，放寬到 720 讓整台機器進得來。 */
+.qc-figure img { width: 100%; height: 100%; object-fit: cover; max-height: 720px; }
 
 /* ---------- News ---------- */
 .news-grid { margin-top: 56px; display: grid; grid-template-columns: repeat(3, 1fr); gap: 1px; background: var(--line); border: 1px solid var(--line); }
@@ -501,6 +503,7 @@ section[id] { scroll-margin-top: calc(var(--header-h) + 8px); }
   .ops-layout { grid-template-columns: 1fr; }
   .qc-split { grid-template-columns: 1fr; }
   .qc-figure { order: -1; }
+  .qc-figure img { max-height: 420px; }   /* 單欄時整個寬度，不收會過高 */
   .news-grid { grid-template-columns: 1fr; }
 }
 @media (max-width: 700px) {
