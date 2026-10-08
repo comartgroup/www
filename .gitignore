@@ -12,3 +12,5 @@ _preview-*.html
 
 # 產生器與後台的臨時測試檔
 _test.html
+__pycache__/
+*.pyc
