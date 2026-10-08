@@ -37,10 +37,11 @@
       unavailable: "Product list is temporarily unavailable. Please contact ",
       count: function (n) { return n + " products"; },
       countOf: function (n, all) { return n + " of " + all + " products"; },
-      more: function (n, all) {
-        return "Showing <b>" + n + "</b> of <b>" + all + "</b> matching products. " +
-               "<b>Please use keyword search</b> above, or filter by category, to find the rest.";
-      }
+      range: function (a, b, all) {
+        return "Showing <b>" + a + "\u2013" + b + "</b> of <b>" + all + "</b> products";
+      },
+      prev: "Previous", next: "Next", pageLabel: "Product pages",
+      goToPage: function (n) { return "Go to page " + n; }
     },
     "zh-TW": {
       existing: "既有產品", quick: "快速客製化",
@@ -56,10 +57,11 @@
       unavailable: "產品清單暫時無法顯示，請聯絡 ",
       count: function (n) { return n + " 項產品"; },
       countOf: function (n, all) { return "符合 " + n + " 項，共 " + all + " 項"; },
-      more: function (n, all) {
-        return "已顯示 <b>" + all + "</b> 項符合條件產品中的 <b>" + n + "</b> 項。" +
-               "請使用上方的<b>關鍵字搜尋</b>，或以類別篩選，以找到其餘產品。";
-      }
+      range: function (a, b, all) {
+        return "顯示第 <b>" + a + "\u2013" + b + "</b> 項，共 <b>" + all + "</b> 項";
+      },
+      prev: "上一頁", next: "下一頁", pageLabel: "產品分頁",
+      goToPage: function (n) { return "前往第 " + n + " 頁"; }
     },
     "vi": {
       existing: "Sản phẩm hiện có", quick: "Tùy biến nhanh",
@@ -75,15 +77,16 @@
       unavailable: "Danh sách sản phẩm tạm thời không khả dụng. Vui lòng liên hệ ",
       count: function (n) { return n + " sản phẩm"; },
       countOf: function (n, all) { return n + " trong " + all + " sản phẩm"; },
-      more: function (n, all) {
-        return "Đang hiển thị <b>" + n + "</b> trong <b>" + all + "</b> sản phẩm phù hợp. " +
-               "Vui lòng dùng <b>tìm kiếm theo từ khóa</b> ở trên, hoặc lọc theo danh mục, để xem phần còn lại.";
-      }
+      range: function (a, b, all) {
+        return "Hiển thị <b>" + a + "\u2013" + b + "</b> trong <b>" + all + "</b> sản phẩm";
+      },
+      prev: "Trước", next: "Tiếp", pageLabel: "Trang sản phẩm",
+      goToPage: function (n) { return "Đến trang " + n; }
     }
   };
   var S = STR[LANG] || STR.en;
 
-  var ROWS = 5;                    // 初始只顯示 5 列，其餘引導使用搜尋
+  var ROWS = 5;                    // 每頁 5 列，欄數隨斷點變動，所以每頁筆數也跟著變
 
   var grid = document.getElementById("prodGrid");
   var BASE = (grid && grid.dataset.base) || "";
@@ -99,7 +102,7 @@
     var t = getComputedStyle(grid).gridTemplateColumns;
     return Math.max(1, (t || "").split(" ").filter(function (v) { return v && v !== "0px"; }).length);
   }
-  function limit() { return ROWS * columns(); }
+  function pageSize() { return ROWS * columns(); }
 
   /* ---------- 資料來源 ---------- */
 
@@ -215,31 +218,74 @@
       "</div></a>";
   }
 
+  /* 分頁。原本的做法是只給前 20 筆、其餘叫使用者自己去搜尋——但使用者不一定
+     知道要搜什麼，也不會預期「清單只給你一部分」。改成標準的上一頁／下一頁。
+     每頁筆數跟著欄數走，所以視窗寬度改變時要重新夾住頁碼，不然會停在空白頁。 */
+  function pageNumbers(cur, total) {
+    if (total <= 7) {
+      var a = [];
+      for (var i = 1; i <= total; i++) a.push(i);
+      return a;
+    }
+    var out = [1];
+    var from = Math.max(2, cur - 1), to = Math.min(total - 1, cur + 1);
+    if (from > 2) out.push("\u2026");
+    for (var j = from; j <= to; j++) out.push(j);
+    if (to < total - 1) out.push("\u2026");
+    out.push(total);
+    return out;
+  }
+
+  function renderPager(list, per, pages) {
+    if (!moreEl) return;
+    if (pages <= 1) { moreEl.hidden = true; moreEl.innerHTML = ""; return; }
+    var first = (state.page - 1) * per + 1;
+    var last = Math.min(state.page * per, list.length);
+    var btns = pageNumbers(state.page, pages).map(function (n) {
+      if (n === "\u2026") return '<span class="pager__gap" aria-hidden="true">\u2026</span>';
+      return '<button type="button" class="pager__n' + (n === state.page ? " is-current" : "") +
+        '" data-page="' + n + '" aria-label="' + esc(S.goToPage(n)) + '"' +
+        (n === state.page ? ' aria-current="page"' : "") + ">" + n + "</button>";
+    }).join("");
+    moreEl.innerHTML =
+      '<div class="pager__count">' + S.range(first, last, list.length) + "</div>" +
+      '<nav class="pager__nav" aria-label="' + esc(S.pageLabel) + '">' +
+        '<button type="button" class="pager__step" data-step="-1"' +
+          (state.page === 1 ? " disabled" : "") + ">\u2039 " + esc(S.prev) + "</button>" +
+        '<span class="pager__nums">' + btns + "</span>" +
+        '<button type="button" class="pager__step" data-step="1"' +
+          (state.page === pages ? " disabled" : "") + ">" + esc(S.next) + " \u203a</button>" +
+      "</nav>";
+    moreEl.hidden = false;
+  }
+
+  function goToPage(n) {
+    state.page = n;
+    apply();
+    // 翻頁後停在清單頂端，否則使用者會留在上一頁的底部看不到新內容
+    var top = grid.getBoundingClientRect().top + window.pageYOffset - 100;
+    window.scrollTo({ top: top, behavior: "smooth" });
+  }
+
   function render(list) {
     if (!list.length) {
       grid.innerHTML = '<p class="prod-state">' +
         esc(all.length ? S.noMatch : S.noneYet) + "</p>";
-      if (moreEl) moreEl.hidden = true;
+      if (moreEl) { moreEl.hidden = true; moreEl.innerHTML = ""; }
       return;
     }
-    var cap = limit();
-    var shown = list.slice(0, cap);
-    grid.innerHTML = shown.map(card).join("");
-
-    // 被截斷時明確告知還有多少，並引導去搜尋——而不是靜默地少給
-    if (moreEl) {
-      if (list.length > cap) {
-        moreEl.innerHTML = S.more(shown.length, list.length);
-        moreEl.hidden = false;
-      } else {
-        moreEl.hidden = true;
-      }
-    }
+    var per = pageSize();
+    var pages = Math.ceil(list.length / per);
+    if (state.page > pages) state.page = pages;   // 欄數變動後頁碼可能超出範圍
+    if (state.page < 1) state.page = 1;
+    var start = (state.page - 1) * per;
+    grid.innerHTML = list.slice(start, start + per).map(card).join("");
+    renderPager(list, per, pages);
   }
 
   /* ---------- 搜尋與篩選 ---------- */
 
-  var state = { q: "", kind: "all", cat: "all" };
+  var state = { q: "", kind: "all", cat: "all", page: 1 };
 
   function matches(p) {
     if (state.kind !== "all" && (p.web_kind || "platform") !== state.kind) return false;
@@ -308,15 +354,16 @@
       clearTimeout(timer);
       timer = setTimeout(function () {
         state.q = search.value.trim().toLowerCase();
+        state.page = 1;
         apply();
       }, 150);
     });
 
     var catSel = document.getElementById("prodCat");
-    if (catSel) catSel.addEventListener("change", function () { state.cat = this.value; apply(); });
+    if (catSel) catSel.addEventListener("change", function () { state.cat = this.value; state.page = 1; apply(); });
 
     var kindSel = document.getElementById("prodKind");
-    if (kindSel) kindSel.addEventListener("change", function () { state.kind = this.value; apply(); });
+    if (kindSel) kindSel.addEventListener("change", function () { state.kind = this.value; state.page = 1; apply(); });
   }
 
   /* ---------- 啟動 ---------- */
@@ -324,6 +371,17 @@
   if (!CFG.url) {
     grid.innerHTML = '<p class="prod-state is-error">' + esc(S.notConfigured) + "</p>";
     return;
+  }
+
+  if (moreEl) {
+    moreEl.addEventListener("click", function (e) {
+      var b = e.target.closest("button[data-page], button[data-step]");
+      if (!b || b.disabled) return;
+      var n = b.hasAttribute("data-page")
+        ? parseInt(b.getAttribute("data-page"), 10)
+        : state.page + parseInt(b.getAttribute("data-step"), 10);
+      if (n && n !== state.page) goToPage(n);
+    });
   }
 
   var rzTimer;
