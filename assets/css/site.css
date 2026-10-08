@@ -890,20 +890,6 @@ section[id] { scroll-margin-top: calc(var(--header-h) + 8px); }
   border-right: 1px solid var(--line); border-bottom: 1px solid var(--line);
   display: flex; flex-direction: column; align-items: flex-start;
 }
-.certcard__logo {
-  width: 100%; height: 62px; margin-bottom: 20px;
-  display: flex; align-items: center; justify-content: flex-start;
-}
-.certcard__logo img { max-height: 62px; max-width: 100%; width: auto; object-fit: contain; }
-/* 圖檔尚未提供時的替代版位：不留空白，也不假裝有 logo */
-.certcard__logo.is-missing::before {
-  content: "LOGO";
-  display: flex; align-items: center; justify-content: center;
-  width: 96px; height: 56px;
-  font-size: 10px; font-weight: 600; letter-spacing: .18em; color: var(--silver);
-  border: 1px dashed var(--line);
-  background: repeating-linear-gradient(135deg, transparent 0 8px, rgba(0,0,0,.02) 8px 16px);
-}
 .certcard__name { font-family: var(--display); font-size: 1.02rem; font-weight: 700; font-stretch: 106%; }
 .certcard__scope { margin-top: 9px; font-size: 13.5px; line-height: 1.5; color: var(--text-muted); }
 
