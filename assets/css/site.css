@@ -408,6 +408,8 @@ section[id] { scroll-margin-top: calc(var(--header-h) + 8px); }
 .cert { background: var(--ink); padding: 20px 22px; font-size: 14.5px; font-weight: 500; letter-spacing: .01em; }
 .cert small { display: block; margin-top: 6px; font-size: 12px; font-weight: 400; color: rgba(255,255,255,.5); letter-spacing: .02em; }
 .cert-note { margin-top: 20px; font-size: 13px; color: rgba(255,255,255,.5); line-height: 1.6; }
+.cert-note a { color: rgba(255,255,255,.82); text-decoration: underline; text-underline-offset: 3px; text-decoration-thickness: 1px; }
+.cert-note a:hover { color: #fff; }
 .qc-figure img { width: 100%; height: 100%; object-fit: cover; max-height: 460px; }
 
 /* ---------- News ---------- */
