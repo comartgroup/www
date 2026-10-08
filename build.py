@@ -107,6 +107,40 @@ def apply_ui(text, ui):
     return re.sub(r'\{\{UI:([a-z0-9_]+)\}\}', sub, text)
 
 
+# 中文沒有空格，瀏覽器會在任意兩字之間斷行，常把「階段」「團隊」這類詞拆開。
+# 把標題按標點切成小句，每句包成 inline-block，瀏覽器就只會在句與句之間斷。
+# 單句若仍塞不下，裡面照常斷行，不會溢出。
+CJK_PUNCT = '。！？；，、：'
+
+def wrap_cjk_clauses(html, lang_code):
+    if not lang_code.startswith('zh'):
+        return html
+
+    def split_clauses(text):
+        out, buf = [], ''
+        for ch in text:
+            buf += ch
+            if ch in CJK_PUNCT:
+                out.append(buf); buf = ''
+        if buf:
+            out.append(buf)
+        return out
+
+    def do_heading(m):
+        open_tag, inner, close_tag = m.group(1), m.group(2), m.group(3)
+        if '<' in inner:                      # 內含標籤（<br>、<em> 等）就不動
+            return m.group(0)
+        if not re.search(r'[\u4e00-\u9fff]', inner):
+            return m.group(0)
+        parts = split_clauses(inner.strip())
+        if len(parts) < 2:                    # 只有一句，包了也沒用
+            return m.group(0)
+        spans = ''.join('<span class="cl">%s</span>' % x for x in parts)
+        return open_tag + spans + close_tag
+
+    return re.sub(r'(<h[12][^>]*>)([^<]+)(</h[12]>)', do_heading, html)
+
+
 def render(page, lang, layout, header, footer, ui):
     """組出單一頁面的完整 HTML。"""
     out = lang['dir'] + page['out']
@@ -135,6 +169,8 @@ def render(page, lang, layout, header, footer, ui):
     nav = page.get('nav')
     if nav:
         html = html.replace('data-nav="%s"' % nav, 'data-nav="%s" class="is-current"' % nav)
+
+    html = wrap_cjk_clauses(html, lang['code'])
 
     leftover = re.findall(r'\{\{[A-Z_]+(?::[a-z0-9_]+)?\}\}', html)
     if leftover:
