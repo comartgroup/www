@@ -1,9 +1,13 @@
 # 認證與法規 Logo
 
-前台 `/quality-compliance/` 讀這個目錄。檔名必須完全一致，格式 **SVG**（PNG 亦可，
-但要改 `src/pages/quality-compliance.html` 的副檔名）。
+**目前認證卡片不放 logo**（2026-10-09 Ariel 決定）。八個版位裡真正能合法放的
+只有 ISO 兩張，而且要用發證機構的標章不是 ISO 官方 logo；其餘不是客戶商標
+就是未持有的認證。八個空的虛線佔位框看起來像沒做完，所以整個拿掉，
+卡片只留名稱與範圍文字。
 
-檔案不存在時版位會顯示虛線的「LOGO」佔位框，不會破圖，也不會假裝有 logo。
+要放回來的話，`src/pages/quality-compliance.html`（三語各一份）加回
+`<div class="certcard__logo">`，CSS 也要把對應規則加回 `assets/css/site.css`。
+下表保留是為了記錄每一張的取得方式與限制。
 
 | 檔名 | 對應 | 取得方式 |
 |---|---|---|
