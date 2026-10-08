@@ -1104,3 +1104,8 @@ body.solid-header .header {
   border-bottom-color: rgba(255, 255, 255, .1);
 }
 body.solid-header { padding-top: 0; }
+
+h1, h2, h3, h4 { text-wrap: balance; }
+.lead, .hero__sub, .page-hero__lead, .prose p, .cap, .entry p, .app p, .prod p,
+.why-list .v, .speclist li, .cert-note, .process-note { text-wrap: pretty; }
+:lang(zh), :lang(ja) { line-break: strict; }
