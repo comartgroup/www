@@ -952,6 +952,39 @@ section[id] { scroll-margin-top: calc(var(--header-h) + 8px); }
 }
 .cat-more b { color: var(--text); font-weight: 600; }
 
+/* ---------- 產品分頁 ----------
+   原本只給前 20 筆再叫使用者自己搜尋。使用者不知道要搜什麼，
+   也不會預期清單只給一部分，所以改成一般人熟悉的上一頁／下一頁。 */
+.pager__count { font-size: 14px; color: var(--text-muted); }
+.pager__count b { color: var(--text); font-weight: 600; }
+.pager__nav {
+  margin-top: 14px; display: flex; flex-wrap: wrap; align-items: center; gap: 8px;
+}
+.pager__nums { display: flex; flex-wrap: wrap; align-items: center; gap: 4px; }
+.pager__step, .pager__n {
+  font: inherit; font-size: 14px; line-height: 1;
+  padding: 10px 14px; min-width: 42px;
+  background: var(--paper); color: var(--text);
+  border: 1px solid var(--line); cursor: pointer;
+  transition: background .2s ease, border-color .2s ease, color .2s ease;
+}
+.pager__step:hover:not(:disabled), .pager__n:hover:not(.is-current) {
+  background: var(--paper-3); border-color: var(--silver);
+}
+.pager__step:disabled { opacity: .4; cursor: default; }
+.pager__n.is-current {
+  background: var(--red); border-color: var(--red); color: #fff; font-weight: 600; cursor: default;
+}
+.pager__gap { padding: 0 4px; color: var(--silver); font-size: 14px; }
+.pager__step:focus-visible, .pager__n:focus-visible { outline: 2px solid var(--red); outline-offset: 2px; }
+
+@media (max-width: 560px) {
+  /* 窄螢幕只留上一頁／下一頁與頁碼文字，數字鍵會擠成兩三行 */
+  .pager__nums { display: none; }
+  .pager__nav { justify-content: space-between; }
+  .pager__step { flex: 1; }
+}
+
 /* =========================================================
    格線修正：整列未填滿時不露出底色
    ---------------------------------------------------------
