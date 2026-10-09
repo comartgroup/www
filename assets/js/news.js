@@ -97,13 +97,38 @@
       "</article>";
   }
 
-  function render(list) {
+  /**
+   * 依事件時間排序。
+   *
+   * 單純照日期新到舊（原本的作法）對「已經發生的消息」是對的，
+   * 但對「還沒發生的展覽」是反的——下週就要開的那場，會被排在一個月後那場的下面。
+   * 單純改成舊到新也不行，那會讓多年前的舊聞永遠佔住最上面。
+   *
+   * 所以分兩段：
+   *   未來的事件（含今天）在前，由近而遠——最快要發生的排第一
+   *   已經發生的在後，由新而舊——最近發生的排第一
+   * 兩段內部都是照事件時間讀下來，合起來也符合使用者真正關心的順序。
+   */
+  function byEventTime(list) {
+    var today = new Date().toISOString().slice(0, 10);   // 與 published_at 同為 YYYY-MM-DD
+    var upcoming = [], past = [];
+    list.forEach(function (n) {
+      (String(n.published_at || "") >= today ? upcoming : past).push(n);
+    });
+    upcoming.sort(function (a, b) { return a.published_at < b.published_at ? -1 : a.published_at > b.published_at ? 1 : 0; });
+    past.sort(function (a, b) { return a.published_at > b.published_at ? -1 : a.published_at < b.published_at ? 1 : 0; });
+    return upcoming.concat(past);
+  }
+
+  function render(list, total) {
     if (!list.length) {
       grid.innerHTML = '<p class="prod-state">' + esc(S.none) + "</p>";
       return;
     }
+    // total 是排序後的總筆數。list 可能已被 limit 切過，
+    // 用 list.length 判斷會在「剛好 3 則」時誤顯示「查看全部」。
     grid.innerHTML = list.map(card).join("") +
-      (limit && list.length >= limit
+      (limit && (total || list.length) > limit
         ? '<div class="news-more"><a class="tlink" href="' + root +
           'news/">' + esc(S.all) + ' <span>&rarr;</span></a></div>'
         : "");
@@ -134,10 +159,13 @@
     return;
   }
 
+  // 這裡刻意不帶 limit。排序要在拿到全部資料之後才決定（見 byEventTime），
+  // 先在伺服器端砍筆數會砍錯——未來的展覽是「日期越大越晚」，
+  // 用 desc + limit 3 拿到的是最遠的三場，不是最近的三場。
+  // 200 只是防呆上限，不是分頁。
   var url = CFG.url + "/rest/v1/web_news" +
             "?select=id,category,published_at,title,body" +
-            "&order=published_at.desc" +
-            (limit ? "&limit=" + limit : "");
+            "&order=published_at.desc&limit=200";
 
   fetch(url, { headers: { apikey: CFG.publishableKey, Authorization: "Bearer " + CFG.publishableKey } })
     .then(function (r) {
@@ -145,8 +173,11 @@
       return r.json();
     })
     .then(function (list) {
-      render(list);
-      buildFilters(list);
+      var sorted = byEventTime(list || []);
+      // 分類篩選要看得到所有分類，所以 buildFilters 吃完整清單；
+      // 只有顯示筆數受 limit 影響。
+      render(limit ? sorted.slice(0, limit) : sorted, sorted.length);
+      buildFilters(sorted);
     })
     .catch(function (err) {
       grid.innerHTML = '<p class="prod-state is-error">' + esc(S.unavailable) + "</p>";
