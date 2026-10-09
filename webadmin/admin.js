@@ -481,9 +481,9 @@
       busy();
       SB.db.select("web_news", { select: "*", order: "published_at.desc" }).then(function (rows) {
         body.innerHTML = '<div class="panel"><div class="panel__head"><div><h3>動態列表</h3>' +
-          "<p>首頁顯示最新 2–3 則已發布的動態</p></div></div>" +
+          "<p>首頁顯示 3 則已發布的動態。排序依<b>活動日期</b>：尚未發生的由近而遠在前，已發生的由新而舊在後</p></div></div>" +
           (rows.length
-            ? "<table><thead><tr><th>標題</th><th>分類</th><th>日期</th><th>狀態</th><th></th></tr></thead><tbody>" +
+            ? "<table><thead><tr><th>標題</th><th>分類</th><th>活動日期</th><th>狀態</th><th></th></tr></thead><tbody>" +
               rows.map(function (n) {
                 return "<tr><td><b>" + (esc((n.title || {}).en) || "（未命名）") + "</b></td><td>" +
                   esc(n.category) + "</td><td>" + esc(n.published_at) + "</td><td>" + statusPill(n.status) +
@@ -751,8 +751,10 @@
       ["Exhibition", "Company", "Certification", "Capability", "Product"].map(function (c) {
         return "<option" + (c === n.category ? " selected" : "") + ">" + c + "</option>";
       }).join("") + "</select></div>" +
-      '<div class="fieldrow"><label>日期</label><input type="date" id="nDate" value="' +
-        esc(n.published_at) + '"></div>' +
+      '<div class="fieldrow"><label>活動日期</label><input type="date" id="nDate" value="' +
+        esc(n.published_at) + '">' +
+      '<div class="hint">請填<b>活動實際發生的日期</b>（展覽就填開展日），不是建檔當天。' +
+      '前台靠它排序：未發生的由近而遠在前，已發生的由新而舊在後。</div></div>' +
       langBlock("news", "title_news", "標題", false, n.title) +
       langBlock("news", "body", "內文", true, n.body) +
       '<div class="rowactions"><button class="btn btn--primary" id="nSave">儲存</button>' +
